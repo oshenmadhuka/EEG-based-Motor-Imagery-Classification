@@ -1,0 +1,11 @@
+[cell 1] Keys: dict_keys(['__header__', '__version__', '__globals__', 'data'])
+[cell 16]   D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\data
+[cell 21] Subject 01: only A01T.mat (missing E)
+[cell 21] Subject 02: only A02T.mat (missing E)
+[cell 21] Subject 03: only A03T.mat (missing E)
+[cell 21] Subject 04: only A04T.mat (missing E)
+[cell 21] Subject 05: only A05T.mat (missing E)
+[cell 21] Subject 06: only A06T.mat (missing E)
+[cell 21] Subject 07: only A07T.mat (missing E)
+[cell 21] Subject 08: only A08T.mat (missing E)
+[cell 21] Subject 09: only A09T.mat (missing E)

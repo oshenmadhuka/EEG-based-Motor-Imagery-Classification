@@ -1,0 +1,158 @@
+[cell 2]   Python   : 3.10.19
+[cell 2]   NumPy    : 1.23.5
+[cell 4] ✓ Loaded 9 subjects successfully.
+[cell 4] Measured acquisition cadence : 8.03 s per trial (median inter-onset spacing, N=2538 intervals)
+[cell 4]   → analysis window is 4.0 s, but each trial COSTS 8.03 s of real recording time.
+[cell 5] Trial counts per subject per class:
+[cell 5] Subject                                            
+[cell 8] → Observable ERD (power decrease) in mu band at the contralateral hemisphere.
+[cell 10] → Each subject has a distinctly different covariance structure — this is the
+[cell 10]   root cause of the calibration bottleneck that EA directly addresses.
+[cell 12] Subject  Original  Rejected  Kept Rejection %
+[cell 12]     S01       288         1   287        0.3%
+[cell 12]     S02       288         1   287        0.3%
+[cell 12]     S03       288         0   288        0.0%
+[cell 12]     S04       288         4   284        1.4%
+[cell 12]     S05       288         1   287        0.3%
+[cell 12]     S06       288         2   286        0.7%
+[cell 12]     S07       288         1   287        0.3%
+[cell 12]     S08       288         2   286        0.7%
+[cell 12]     S09       288         0   288        0.0%
+[cell 12] Mean rejection rate: 0.5%
+[cell 13] Applying bandpass filter (8–30 Hz, 4th-order Butterworth) …
+[cell 13] ✓ Bandpass filtering complete.
+[cell 15] Applying Euclidean Alignment …
+[cell 15]   S01 → EA applied in 143.0 ms | mean |X| before: 3.8205 | after: 0.0247
+[cell 15]   S02 → EA applied in 145.8 ms | mean |X| before: 3.8265 | after: 0.0246
+[cell 15]   S03 → EA applied in 151.6 ms | mean |X| before: 5.0906 | after: 0.0247
+[cell 15]   S04 → EA applied in 143.5 ms | mean |X| before: 3.5243 | after: 0.0248
+[cell 15]   S05 → EA applied in 148.3 ms | mean |X| before: 2.8277 | after: 0.0247
+[cell 15]   S06 → EA applied in 157.8 ms | mean |X| before: 4.9122 | after: 0.0245
+[cell 15]   S07 → EA applied in 152.8 ms | mean |X| before: 3.4302 | after: 0.0246
+[cell 15]   S08 → EA applied in 150.6 ms | mean |X| before: 6.7634 | after: 0.0246
+[cell 15]   S09 → EA applied in 156.5 ms | mean |X| before: 6.7691 | after: 0.0243
+[cell 15] ✓ EA complete. Mean computation time: 150.0 ms/subject
+[cell 15]   → EA is computationally trivial — suitable for real-time BCI deployment.
+[cell 16] Alignment Quality — Frobenius distance from Identity Matrix:
+[cell 16] Subject       Before EA     After EA    Reduction
+[cell 16]   S01           398.8600       4.6857        98.8%
+[cell 16]   S02           466.7037       4.6857        99.0%
+[cell 16]   S03           791.4666       4.6857        99.4%
+[cell 16]   S04           344.6599       4.6857        98.6%
+[cell 16]   S05           255.0822       4.6857        98.2%
+[cell 16]   S06           626.5875       4.6857        99.3%
+[cell 16]   S07           334.5533       4.6857        98.6%
+[cell 16]   S08          1310.5256       4.6857        99.6%
+[cell 16]   S09          1191.5833       4.6857        99.6%
+[cell 18]   (classifier): Linear(in_features=496, out_features=2, bias=True)
+[cell 20] Training infrastructure ready.
+[cell 21] Running Leave-One-Subject-Out pre-training …
+[cell 21]   Zero-shot → Acc: 65.0%  AUC: 0.839  κ: 0.298
+[cell 21]   Zero-shot → Acc: 63.9%  AUC: 0.676  κ: 0.278
+[cell 21]   Zero-shot → Acc: 90.3%  AUC: 0.960  κ: 0.806
+[cell 21]   Zero-shot → Acc: 69.0%  AUC: 0.776  κ: 0.382
+[cell 21]   Zero-shot → Acc: 60.4%  AUC: 0.635  κ: 0.208
+[cell 21]   Zero-shot → Acc: 67.1%  AUC: 0.782  κ: 0.343
+[cell 21]   Zero-shot → Acc: 63.9%  AUC: 0.695  κ: 0.278
+[cell 21]   Zero-shot → Acc: 85.4%  AUC: 0.953  κ: 0.708
+[cell 21]   Zero-shot → Acc: 91.7%  AUC: 0.964  κ: 0.833
+[cell 21]   Mean zero-shot accuracy: 73.0%
+[cell 24] Fine-tuning function defined.
+[cell 24]   Calibration trials : 36 (~4.8 min at 8.03 s/trial, measured)
+[cell 24]   Fine-tune LR       : 5e-05
+[cell 24]   Max epochs         : 30
+[cell 24]   Early-stop patience: 10
+[cell 24]   Model selection    : validation split of calibration data (no test-set leakage)
+[cell 25] Fine-tuning pre-trained models on each target subject …
+[cell 25] Calibration = 36 trials  ≈ 4.8 min (measured, 8.03 s/trial)
+[cell 25] Subject      Zero-Shot Acc   After FT Acc      AUC        κ      Δ Acc
+[cell 25]   S01                61.7%           70.1%     0.814     0.409       +8.4%
+[cell 25]   S02                66.7%           68.5%     0.720     0.370       +1.9%
+[cell 25]   S03                94.4%           92.6%     0.980     0.851       -1.9%
+[cell 25]   S04                69.8%           71.7%     0.803     0.441       +1.9%
+[cell 25]   S05                61.1%           59.3%     0.606     0.180       -1.9%
+[cell 25]   S06                63.6%           62.6%     0.745     0.255       -0.9%
+[cell 25]   S07                62.0%           63.0%     0.689     0.271       +0.9%
+[cell 25]   S08                82.4%           81.5%     0.954     0.634       -0.9%
+[cell 25]   S09                91.7%           91.7%     0.969     0.833       +0.0%
+[cell 25]   MEAN                72.6%           73.4%     0.809     0.471       +0.8%
+[cell 29] Ablation — Baseline (No TL) & FT without EA …
+[cell 29]   S01 | Baseline:  55.1% | FT w/o EA:  79.4% | Zero-Shot:  61.7% | EA-FT:  70.1%
+[cell 29]   S02 | Baseline:  48.1% | FT w/o EA:  65.7% | Zero-Shot:  66.7% | EA-FT:  68.5%
+[cell 29]   S03 | Baseline:  53.7% | FT w/o EA:  96.3% | Zero-Shot:  94.4% | EA-FT:  92.6%
+[cell 29]   S04 | Baseline:  54.7% | FT w/o EA:  83.0% | Zero-Shot:  69.8% | EA-FT:  71.7%
+[cell 29]   S05 | Baseline:  50.9% | FT w/o EA:  55.6% | Zero-Shot:  61.1% | EA-FT:  59.3%
+[cell 29]   S06 | Baseline:  52.3% | FT w/o EA:  76.6% | Zero-Shot:  63.6% | EA-FT:  62.6%
+[cell 29]   S07 | Baseline:  48.1% | FT w/o EA:  50.0% | Zero-Shot:  62.0% | EA-FT:  63.0%
+[cell 29]   S08 | Baseline:  47.2% | FT w/o EA:  88.9% | Zero-Shot:  82.4% | EA-FT:  81.5%
+[cell 29]   S09 | Baseline:  49.1% | FT w/o EA:  87.0% | Zero-Shot:  91.7% | EA-FT:  91.7%
+[cell 29] Ablation Study — Classification Accuracy (%) on Binary MI Task:
+[cell 29]          Baseline\n(No TL)  Zero-Shot\n(No FT)  FT without EA  EA-FT EEGNet\n(Ours)
+[cell 29] Subject                                                                            
+[cell 29] Mean                  51.0                72.6           75.8                  73.4
+[cell 30]   Baseline (no TL)      : 51.0%
+[cell 30]   Zero-Shot (no FT)     : 72.6%
+[cell 30]   FT without EA         : 75.8%
+[cell 30]   EA-FT EEGNet (Ours)   : 73.4%
+[cell 30]   EA contribution (FT w/o EA → Ours): -2.4%
+[cell 32] Zero-shot cross-subject transfer (NO fine-tuning) — same test trials:
+[cell 32] Subject     No EA (%)  With EA (%)   Δ EA (%)
+[cell 32] MEAN             72.1         72.6       +0.5
+[cell 32] → EA changes zero-shot transfer by +0.5 pts on average (this is the direct test of the 'alignment enables transfer' hypothesis).
+[cell 34] Deployment-realistic EA-FT (reference from calibration trials only):
+[cell 34] Subject    Transductive EA-FT   Calib-only EA-FT       Δ
+[cell 34] MEAN                     73.4               74.1    +0.6
+[cell 34]   HEADLINE (calibration-only EA, deployable) : 74.1%
+[cell 34]   ORACLE   (transductive EA, upper bound)    : 73.4%
+[cell 34]   Optimism gap (oracle − headline)           : -0.6 pts
+[cell 34] → The 74.1% calibration-only figure is the PRIMARY reported result (no test-data
+[cell 34]   peeking during alignment). The transductive 73.4% is a clearly-labelled oracle
+[cell 35]                                   Mean Acc (%) Calibration Time Parameters           Reference
+[cell 35] DeepConvNet (no TL)                  62.400000           30 min    170,000  Schirrmeister 2017
+[cell 35] ShallowConvNet (no TL)               64.100000           30 min     44,000  Schirrmeister 2017
+[cell 35] Standard EEGNet (no TL)              65.800000           30 min     ~2,000        Lawhern 2018
+[cell 35] EEGNet + Riemannian Alignment        74.200000           15 min     ~2,000        He & Wu 2020
+[cell 35] EEGNet + Domain Adaptation (MDM)     76.100000           20 min     ~2,000      Barachant 2012
+[cell 35] EA-FT EEGNet (Ours, 36 trials)       73.432208         ~4.8 min     ~2,000           This Work
+[cell 38]   EA-FT EEGNet — Final Results Summary
+[cell 38]          Zero-Shot Acc (%)  FT Acc (%)    AUC  Cohen κ  Calib Trials  Trainable Params
+[cell 38] Subject                                                                               
+[cell 38] S01                 61.682      70.093  0.814    0.409          36.0            1538.0
+[cell 38] S02                 66.667      68.519  0.720    0.370          36.0            1538.0
+[cell 38] S03                 94.444      92.593  0.980    0.851          36.0            1538.0
+[cell 38] S04                 69.811      71.698  0.803    0.441          36.0            1538.0
+[cell 38] S05                 61.111      59.259  0.606    0.180          36.0            1538.0
+[cell 38] S06                 63.551      62.617  0.745    0.255          36.0            1538.0
+[cell 38] S07                 62.037      62.963  0.689    0.271          36.0            1538.0
+[cell 38] S08                 82.407      81.481  0.954    0.634          36.0            1538.0
+[cell 38] S09                 91.667      91.667  0.969    0.833          36.0            1538.0
+[cell 38] Mean                72.598      73.432  0.809    0.471          36.0            1538.0
+[cell 38] Std                 13.344      12.400  0.134    0.247           0.0               0.0
+[cell 38] Median              66.667      70.093  0.803    0.409          36.0            1538.0
+[cell 39]   Wilcoxon signed-rank tests — EA-FT EEGNet vs baselines (n = 9 subjects)
+[cell 39]   H0: median per-subject accuracy difference (EA-FT − baseline) = 0
+[cell 39]                                Median Δ (pts)  Mean Δ (pts) Subjects EA-FT wins     W  p (two-sided)  Effect size r Sig. (α=.05)
+[cell 39] EA-FT vs From-scratch (No TL)         16.9811       22.3860                 9/9   0.0         0.0039         1.0000          Yes
+[cell 39] EA-FT vs Zero-shot EA (No FT)          0.0000        0.8346                 4/9  14.0         0.5745         0.2222           No
+[cell 39] EA-FT vs FT without EA                -3.7037       -2.4136                 4/9  15.5         0.4258        -0.3111           No
+[cell 39] Note: with n = 9 the smallest attainable two-sided p is ~0.004; a non-significant
+[cell 39] result can reflect limited power (few subjects) as much as a small true effect.
+[cell 39] Δ = accuracy difference in percentage points. Positive Δ favours EA-FT.
+[cell 40] Accuracy vs calibration size (mean over 9 subjects × 5 repeats):
+[cell 40]  Trials   Minutes  Mean Acc %     Std
+[cell 40]      10      1.34        72.9    12.0
+[cell 40]      18      2.41        73.2    11.9
+[cell 40]      27      3.61        74.4    11.4
+[cell 40]      36      4.82        73.7    11.2
+[cell 40]      54      7.23        74.4    11.2
+[cell 40]      72      9.64        74.4    11.4
+[cell 42]   EA-FT EEGNet — Final Summary:
+[cell 42]   Mean Accuracy  : 73.4%
+[cell 42]   Mean AUC       : 0.809
+[cell 42]   Mean Cohen κ   : 0.471
+[cell 42]   Calibration    : ~4.8 min (36 trials @ 8.03 s/trial, measured)
+[cell 42]   Reduction vs 20–30 min baseline: 76%–84%
+[cell 44] Demo artifacts written to D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\results\demo
+[cell 44]   demo_bundle.npz        105.58 MB
+[cell 44]   demo_summary.json        0.00 MB
+[cell 44]   eaft_models.pt           0.15 MB

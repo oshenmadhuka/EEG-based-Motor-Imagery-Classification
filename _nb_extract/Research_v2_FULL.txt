@@ -1,0 +1,1121 @@
+===== CELL 0 [markdown] =====
+Dataset overview
+
+**Goal:** Understand structure. You can tell your supervisor: the file organizes **multiple sessions** (columns in `data['data']`), each with continuous EEG and metadata.
+
+
+===== CELL 1 [code] =====
+from scipy.io import loadmat
+
+data = loadmat("../data/A01T.mat")
+
+print("Keys:", data.keys())
+print("Shape of data:", data["data"].shape)
+--- OUTPUT ---
+Keys: dict_keys(['__header__', '__version__', '__globals__', 'data'])
+Shape of data: (1, 9)
+
+
+===== CELL 2 [markdown] =====
+Explore one session
+
+**Fields:**
+- **X** — continuous EEG (time × channels)
+- **y** — trial labels
+- **trial** — sample indices where each trial starts
+- **fs** — sampling rate (Hz)
+- **classes** — text names for class ids
+
+
+===== CELL 3 [code] =====
+session = data["data"][0, 0]
+
+print("Fields:", session.dtype.names)
+--- OUTPUT ---
+Fields: ('X', 'trial', 'y', 'fs', 'classes', 'artifacts', 'gender', 'age')
+
+
+===== CELL 4 [markdown] =====
+**Explain:** EEG matrix **X** is **time samples × channels** (here 25 EEG channels). **fs = 250 Hz** means 250 samples per second. Labels **y** and **trial** may be empty for some sessions (e.g. practice runs).
+
+
+===== CELL 5 [code] =====
+X = session["X"][0, 0]
+y = session["y"][0, 0]
+trial = session["trial"][0, 0]
+fs = session["fs"][0, 0]
+classes = session["classes"][0, 0]
+
+print("X shape:", X.shape)
+print("y shape:", y.shape)
+print("trial shape:", trial.shape)
+print("Sampling rate:", fs)
+print("Classes:", classes)
+--- OUTPUT ---
+X shape: (29683, 25)
+y shape: (0, 1)
+trial shape: (0, 1)
+Sampling rate: [[250]]
+Classes: [[array(['left hand'], dtype='<U9') array(['right hand'], dtype='<U10')
+  array(['feet'], dtype='<U4') array(['tongue'], dtype='<U6')]]
+
+
+===== CELL 6 [markdown] =====
+EEG is **noisy**; amplitude fluctuates with brain activity, muscle, line noise, etc.
+
+
+===== CELL 7 [code] =====
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 4))
+plt.plot(X[:, 0])
+plt.title("Raw EEG Signal - Channel 1")
+plt.xlabel("Time (samples)")
+plt.ylabel("Amplitude")
+plt.show()
+--- OUTPUT ---
+<Figure size 1200x400 with 1 Axes>
+
+===== CELL 8 [markdown] =====
+List sessions and find one where **y** and **trial** are non-empty so you can segment trials.
+
+
+===== CELL 9 [code] =====
+for i in range(data["data"].shape[1]):
+    session = data["data"][0, i]
+
+    X = session["X"][0, 0]
+    y = session["y"][0, 0]
+    trial = session["trial"][0, 0]
+
+    print(f"Session {i}")
+    print("  y shape:", y.shape)
+    print("  trial shape:", trial.shape)
+    print("-" * 30)
+--- OUTPUT ---
+Session 0
+  y shape: (0, 1)
+  trial shape: (0, 1)
+------------------------------
+Session 1
+  y shape: (0, 1)
+  trial shape: (0, 1)
+------------------------------
+Session 2
+  y shape: (0, 1)
+  trial shape: (0, 1)
+------------------------------
+Session 3
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+Session 4
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+Session 5
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+Session 6
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+Session 7
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+Session 8
+  y shape: (48, 1)
+  trial shape: (48, 1)
+------------------------------
+
+
+===== CELL 10 [markdown] =====
+Extract one trial
+
+Use a session index that has labels (from Step 5). The template used **column 3**; if your printout shows another column with non-empty `y`, change the index to match.
+
+Below we also set `valid_session_idx` to the **first** session with at least one label so the same notebook works across files without manual guessing.
+
+
+===== CELL 11 [code] =====
+valid_session_idx = None
+for i in range(data["data"].shape[1]):
+    s = data["data"][0, i]
+    y_s = s["y"][0, 0]
+    if y_s.size > 0:
+        valid_session_idx = i
+        break
+
+if valid_session_idx is None:
+    raise ValueError("No session with labels found — check .mat file.")
+
+# Original template: session = data['data'][0, 3]
+session = data["data"][0, valid_session_idx]
+
+X = session["X"][0, 0]
+y = session["y"][0, 0]
+trial = session["trial"][0, 0]
+
+fs = int(session["fs"][0, 0].squeeze())
+window = 4 * fs
+
+start = int(trial[0][0])
+end = start + window
+
+trial_signal = X[start:end, :]
+label = int(y[0][0])
+
+print("Using session index:", valid_session_idx)
+print("Trial shape:", trial_signal.shape)
+print("Label:", label)
+--- OUTPUT ---
+Using session index: 3
+Trial shape: (1000, 25)
+Label: 4
+
+
+===== CELL 12 [markdown] =====
+Visualize one trial
+
+
+===== CELL 13 [code] =====
+plt.figure(figsize=(12, 4))
+plt.plot(trial_signal[:, 0])
+plt.title(f"Trial EEG Signal - Label {label}")
+plt.xlabel("Samples")
+plt.ylabel("Amplitude")
+plt.show()
+--- OUTPUT ---
+<Figure size 1200x400 with 1 Axes>
+
+===== CELL 14 [markdown] =====
+The full 2a task has four classes (**1 = left**, **2 = right**, **3 = feet**, **4 = tongue**); the `classes` field in the file lists all four. **This research uses only left vs right hand**: the training code in `src/load_data.py` keeps trials with labels 1 and 2 only and maps them to **0 = left**, **1 = right**. Raw left vs right traces can still look similar; filtering + models (EEGNet) help.
+
+
+===== CELL 15 [code] =====
+session = data["data"][0, valid_session_idx]
+X = session["X"][0, 0]
+y = session["y"][0, 0]
+trial = session["trial"][0, 0]
+fs = int(session["fs"][0, 0].squeeze())
+window = 4 * fs
+
+left_trials = []
+right_trials = []
+
+for i in range(len(trial)):
+    start = int(trial[i][0])
+    end = start + window
+
+    if end <= X.shape[0]:
+        segment = X[start:end, :]
+        label = int(y[i][0])
+
+        if label == 1:
+            left_trials.append(segment)
+        elif label == 2:
+            right_trials.append(segment)
+
+if not left_trials or not right_trials:
+    raise ValueError(
+        "Need at least one left (1) and one right (2) trial in this session. "
+        f"Got left={len(left_trials)}, right={len(right_trials)}"
+    )
+
+plt.figure(figsize=(12, 4))
+plt.plot(left_trials[0][:, 0], label="Left Hand")
+plt.plot(right_trials[0][:, 0], label="Right Hand")
+plt.legend()
+plt.title("Left vs Right EEG Signal (channel 0, first trial each)")
+plt.xlabel("Samples")
+plt.ylabel("Amplitude")
+plt.show()
+--- OUTPUT ---
+<Figure size 1200x400 with 1 Axes>
+
+===== CELL 16 [code] =====
+from pathlib import Path
+
+DATA_DIR = Path("../data").resolve()
+mat_files = sorted(DATA_DIR.glob("*.mat"))
+print(f"Found {len(mat_files)} file(s) in:\n  {DATA_DIR}\n")
+for p in mat_files:
+    print(" ", p.name)
+if not mat_files:
+    print("Tip: place A01T.mat … A09E.mat (or any Graz 2a .mat) inside the data/ folder next to this notebook.")
+--- OUTPUT ---
+Found 9 file(s) in:
+  D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\data
+
+  A01T.mat
+  A02T.mat
+  A03T.mat
+  A04T.mat
+  A05T.mat
+  A06T.mat
+  A07T.mat
+  A08T.mat
+  A09T.mat
+
+
+===== CELL 17 [code] =====
+def summarize_bcic_iv_2a_mat(path: Path) -> None:
+    """One summary block per file — same schema as A01T (Graz 2a)."""
+    d = loadmat(path)
+    if "data" not in d:
+        print(f"\n=== {path.name} ===\n  no 'data' key — not standard Graz 2a .mat layout.")
+        return
+    block = d["data"]
+    n_sessions = block.shape[1]
+    print(f"\n=== {path.name} ===")
+    print(f"  data['data'] shape: {block.shape}  → {n_sessions} session column(s)")
+    total_labeled_trials = 0
+    chans = fs_ref = None
+    for i in range(n_sessions):
+        sess = block[0, i]
+        X = sess["X"][0, 0]
+        y = sess["y"][0, 0]
+        trial = sess["trial"][0, 0]
+        fs = int(sess["fs"][0, 0].squeeze())
+        if chans is None:
+            chans = X.shape[1]
+        fs_ref = fs
+        if y.size and trial.size:
+            n_tr = trial.shape[0]
+            total_labeled_trials += n_tr
+            print(f"  session {i}: X {X.shape}, labeled trials = {n_tr}, fs = {fs} Hz")
+    print(f"  → channels = {chans}, fs = {fs_ref} Hz, total labeled trials (file) = {total_labeled_trials}")
+
+
+for mat_path in mat_files:
+    summarize_bcic_iv_2a_mat(mat_path)
+--- OUTPUT ---
+
+=== A01T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A02T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A03T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A04T.mat ===
+  data['data'] shape: (1, 7)  → 7 session column(s)
+  session 1: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 2: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A05T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A06T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A07T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A08T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+=== A09T.mat ===
+  data['data'] shape: (1, 9)  → 9 session column(s)
+  session 3: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 4: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 5: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 6: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 7: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  session 8: X (96735, 25), labeled trials = 48, fs = 250 Hz
+  → channels = 25, fs = 250 Hz, total labeled trials (file) = 288
+
+
+===== CELL 18 [markdown] =====
+### Quick visual comparison (channel 0, first ~5 s of session 0)
+
+Same y-axis scale is not enforced across subjects — this is only to **see** that every file has comparable continuous EEG before trial cutting.
+
+===== CELL 19 [code] =====
+import math
+
+if not mat_files:
+    print("No .mat files to plot.")
+else:
+    n_files = len(mat_files)
+    ncols = min(3, n_files)
+    nrows = math.ceil(n_files / ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4 * ncols, 2.8 * nrows), squeeze=False)
+    for idx, path in enumerate(mat_files):
+        r, c = divmod(idx, ncols)
+        ax = axes[r][c]
+        d = loadmat(path)
+        X0 = d["data"][0, 0]["X"][0, 0]
+        fs0 = int(d["data"][0, 0]["fs"][0, 0].squeeze())
+        n_plot = min(5 * fs0, X0.shape[0])
+        ax.plot(X0[:n_plot, 0], lw=0.6)
+        ax.set_title(path.name, fontsize=9)
+        ax.set_xlabel("sample")
+        ax.set_ylabel("ch0")
+    for j in range(idx + 1, nrows * ncols):
+        r, c = divmod(j, ncols)
+        axes[r][c].set_visible(False)
+    plt.tight_layout()
+    plt.show()
+--- OUTPUT ---
+<Figure size 1200x840 with 9 Axes>
+
+===== CELL 20 [markdown] =====
+### Same subject: training (`T`) vs evaluation (`E`)
+
+If you have both `AxxT.mat` and `AxxE.mat`, this lists pairs so you can compare **T** vs **E** for cross-session / domain-shift experiments later.
+
+===== CELL 21 [code] =====
+import re
+
+pairs: dict[str, dict[str, Path]] = {}
+for p in mat_files:
+    m = re.match(r"A(\d+)([TE])\.mat", p.name, re.I)
+    if m:
+        subj, kind = m.group(1), m.group(2).upper()
+        pairs.setdefault(subj, {})[kind] = p
+
+for subj in sorted(pairs.keys(), key=int):
+    kinds = pairs[subj]
+    if "T" in kinds and "E" in kinds:
+        print(f"Subject {subj}:  {kinds['T'].name}  +  {kinds['E'].name}")
+    else:
+        missing = "T" if "T" not in kinds else "E"
+        print(f"Subject {subj}: only {list(kinds.values())[0].name} (missing {missing})")
+--- OUTPUT ---
+Subject 01: only A01T.mat (missing E)
+Subject 02: only A02T.mat (missing E)
+Subject 03: only A03T.mat (missing E)
+Subject 04: only A04T.mat (missing E)
+Subject 05: only A05T.mat (missing E)
+Subject 06: only A06T.mat (missing E)
+Subject 07: only A07T.mat (missing E)
+Subject 08: only A08T.mat (missing E)
+Subject 09: only A09T.mat (missing E)
+
+
+===== CELL 22 [markdown] =====
+## EA-FT EEGNet Integration
+
+This section extends the notebook from dataset exploration to the proposed **EA-FT EEGNet** pipeline used in the proposal:
+
+1. Load Graz 2a trials.
+2. Keep only **left-hand vs right-hand** motor imagery.
+3. Apply **bandpass filtering** in the motor-imagery rhythm range.
+4. Apply **Euclidean Alignment (EA)** to reduce subject/session distribution shift.
+5. Train an EEGNet source model.
+6. Fine-tune only the higher/adaptation layers using a small amount of target-subject calibration data.
+
+For today’s research meeting, you can explain this as: **EA aligns the input space; fine-tuning adapts the model weights using only a small amount of target-user data.**
+
+===== CELL 23 [code] =====
+# Core imports for EA-FT pipeline
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+from scipy.io import loadmat
+from scipy.signal import butter, filtfilt
+from scipy.linalg import fractional_matrix_power
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# PyTorch imports
+try:
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from torch.utils.data import TensorDataset, DataLoader
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("PyTorch is not installed. Install it before running the EEGNet training/fine-tuning cells.")
+
+RANDOM_STATE = 42
+np.random.seed(RANDOM_STATE)
+if TORCH_AVAILABLE:
+    torch.manual_seed(RANDOM_STATE)
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Using device:", DEVICE)
+--- OUTPUT ---
+Using device: cpu
+
+
+===== CELL 24 [markdown] =====
+### 1. Trial extraction for left vs right hand
+
+BCI Competition IV 2a uses labels:
+
+- `1` = left hand
+- `2` = right hand
+
+For this research scope, we keep only labels `1` and `2`, then remap them to:
+
+- `0` = left hand
+- `1` = right hand
+
+The model input format will be **trials × channels × time**.
+
+===== CELL 25 [code] =====
+def bandpass_filter_trials(trials, fs, low=8.0, high=30.0, order=4):
+    """Bandpass filter trials shaped (n_trials, n_channels, n_times)."""
+    nyq = 0.5 * fs
+    b, a = butter(order, [low / nyq, high / nyq], btype="band")
+    return filtfilt(b, a, trials, axis=-1)
+
+
+def extract_left_right_trials_from_mat(path: Path, tmin=0.5, tmax=4.0, low=8.0, high=30.0):
+    """
+    Load a Graz 2a .mat file and return left/right trials.
+
+    Returns
+    -------
+    X_trials : np.ndarray
+        Shape: (n_trials, n_channels, n_times)
+    y_trials : np.ndarray
+        Shape: (n_trials,), where 0=left and 1=right
+    fs : int
+        Sampling rate
+    """
+    d = loadmat(path)
+    block = d["data"]
+    X_all, y_all = [], []
+    fs_ref = None
+
+    for session_idx in range(block.shape[1]):
+        session = block[0, session_idx]
+        X_cont = session["X"][0, 0]          # time x channels
+        y = session["y"][0, 0].squeeze()
+        trial = session["trial"][0, 0].squeeze()
+        fs = int(session["fs"][0, 0].squeeze())
+        fs_ref = fs
+
+        if y.size == 0 or trial.size == 0:
+            continue
+
+        start_offset = int(tmin * fs)
+        stop_offset = int(tmax * fs)
+
+        for onset, label in zip(trial, y):
+            label = int(label)
+            if label not in [1, 2]:
+                continue
+
+            start = int(onset) + start_offset
+            stop = int(onset) + stop_offset
+
+            if start >= 0 and stop <= X_cont.shape[0]:
+                segment = X_cont[start:stop, :].T  # channels x time
+                X_all.append(segment)
+                y_all.append(0 if label == 1 else 1)
+
+    if not X_all:
+        raise ValueError(f"No left/right labelled trials found in {path.name}")
+
+    X_trials = np.stack(X_all).astype(np.float32)
+    y_trials = np.array(y_all, dtype=np.int64)
+
+    X_trials = bandpass_filter_trials(X_trials, fs_ref, low=low, high=high).astype(np.float32)
+    return X_trials, y_trials, fs_ref
+
+
+# Test extraction with A01T.mat or the first available .mat file
+example_file = DATA_DIR / "A01T.mat" if (DATA_DIR / "A01T.mat").exists() else (mat_files[0] if mat_files else None)
+
+if example_file is not None:
+    X_ex, y_ex, fs_ex = extract_left_right_trials_from_mat(example_file)
+    print("File:", example_file.name)
+    print("X shape:", X_ex.shape, "= trials x channels x time")
+    print("y shape:", y_ex.shape)
+    print("fs:", fs_ex)
+    print("Class counts [left, right]:", np.bincount(y_ex))
+else:
+    print("No .mat files found. Add Graz 2a files to the data folder before running this cell.")
+--- OUTPUT ---
+File: A01T.mat
+X shape: (144, 25, 875) = trials x channels x time
+y shape: (144,)
+fs: 250
+Class counts [left, right]: [72 72]
+
+
+===== CELL 26 [markdown] =====
+### 2. Euclidean Alignment (EA)
+
+EA is an unsupervised input-space alignment method. For each subject/session, we estimate the average covariance matrix across trials and whiten the trials using its inverse square root.
+
+Mathematically:
+
+\[
+\bar{R}=\frac{1}{N}\sum_{i=1}^{N} X_iX_i^T
+\]
+
+\[
+\tilde{X_i}=\bar{R}^{-1/2}X_i
+\]
+
+After EA, the average covariance becomes closer to the identity matrix. This helps reduce subject-to-subject distribution differences before EEGNet receives the signal.
+
+===== CELL 27 [code] =====
+def fit_euclidean_alignment(X, eps=1e-6):
+    """
+    Fit Euclidean Alignment reference matrix.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Trials shaped (n_trials, n_channels, n_times).
+    eps : float
+        Small diagonal regularization for numerical stability.
+
+    Returns
+    -------
+    R_inv_sqrt : np.ndarray
+        Inverse square root of average covariance, shaped (n_channels, n_channels).
+    R_bar : np.ndarray
+        Average covariance matrix before whitening.
+    """
+    n_trials, n_channels, _ = X.shape
+    covs = np.zeros((n_trials, n_channels, n_channels), dtype=np.float64)
+
+    for i in range(n_trials):
+        Xi = X[i]
+        covs[i] = (Xi @ Xi.T) / Xi.shape[1]
+
+    R_bar = covs.mean(axis=0)
+    R_bar += eps * np.eye(n_channels)
+    R_inv_sqrt = fractional_matrix_power(R_bar, -0.5).real
+    return R_inv_sqrt.astype(np.float32), R_bar.astype(np.float32)
+
+
+def apply_euclidean_alignment(X, R_inv_sqrt):
+    """Apply fitted EA matrix to trials shaped (n_trials, n_channels, n_times)."""
+    return np.asarray([R_inv_sqrt @ Xi for Xi in X], dtype=np.float32)
+
+
+def euclidean_align_subject(X):
+    """Convenience function: fit EA on a subject/session and transform that same data."""
+    R_inv_sqrt, R_bar = fit_euclidean_alignment(X)
+    X_ea = apply_euclidean_alignment(X, R_inv_sqrt)
+    return X_ea, R_inv_sqrt, R_bar
+
+
+if example_file is not None:
+    X_ea_ex, R_inv_sqrt_ex, R_bar_ex = euclidean_align_subject(X_ex)
+    avg_cov_after = np.mean([(Xi @ Xi.T) / Xi.shape[1] for Xi in X_ea_ex], axis=0)
+
+    print("Before EA - average covariance shape:", R_bar_ex.shape)
+    print("After EA  - average covariance shape:", avg_cov_after.shape)
+    print("Mean diagonal after EA:", np.mean(np.diag(avg_cov_after)))
+    print("Mean absolute off-diagonal after EA:", np.mean(np.abs(avg_cov_after - np.eye(avg_cov_after.shape[0]))))
+--- OUTPUT ---
+Before EA - average covariance shape: (25, 25)
+After EA  - average covariance shape: (25, 25)
+Mean diagonal after EA: 0.99999505
+Mean absolute off-diagonal after EA: 9.534620893766999e-07
+
+
+===== CELL 28 [code] =====
+# Visual check: average covariance before vs after EA
+if example_file is not None:
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+    im0 = axes[0].imshow(R_bar_ex, aspect="auto")
+    axes[0].set_title("Before EA: average covariance")
+    plt.colorbar(im0, ax=axes[0], fraction=0.046)
+
+    im1 = axes[1].imshow(avg_cov_after, aspect="auto")
+    axes[1].set_title("After EA: average covariance")
+    plt.colorbar(im1, ax=axes[1], fraction=0.046)
+
+    plt.tight_layout()
+    plt.show()
+--- OUTPUT ---
+<Figure size 1000x400 with 4 Axes>
+
+===== CELL 29 [markdown] =====
+### 3. Build source and target datasets
+
+For cross-subject transfer learning:
+
+- **Source data** = all subjects except the target subject.
+- **Target calibration data** = only a small amount of target-subject data.
+- **Target test data** = held-out target-subject data used to evaluate whether calibration time is reduced.
+
+For the meeting, you can explain the experiment as a **leave-one-subject-out transfer learning setup**.
+
+===== CELL 30 [code] =====
+def subject_id_from_filename(path: Path):
+    """Extract subject id from names such as A01T.mat or A09E.mat."""
+    m = re.match(r"A(\d+)([TE])\.mat", path.name, re.I)
+    return m.group(1) if m else path.stem
+
+
+def load_all_subjects_left_right(mat_files, use_only_training_files=True):
+    """
+    Load all available subjects into a dictionary.
+
+    By default, only AxxT.mat files are used because evaluation files may not always contain labels.
+    """
+    subjects = {}
+    for p in mat_files:
+        if use_only_training_files and not p.name.upper().endswith("T.MAT"):
+            continue
+        try:
+            X, y, fs = extract_left_right_trials_from_mat(p)
+            X_ea, R_inv_sqrt, R_bar = euclidean_align_subject(X)
+            subj = subject_id_from_filename(p)
+            subjects[subj] = {
+                "file": p,
+                "X_raw": X,
+                "X_ea": X_ea,
+                "y": y,
+                "fs": fs,
+                "R_inv_sqrt": R_inv_sqrt,
+                "R_bar": R_bar,
+            }
+            print(f"Loaded subject {subj} from {p.name}: X={X_ea.shape}, y={np.bincount(y)}")
+        except Exception as e:
+            print(f"Skipped {p.name}: {e}")
+    return subjects
+
+
+subjects = load_all_subjects_left_right(mat_files) if mat_files else {}
+print("Subjects loaded:", list(subjects.keys()))
+--- OUTPUT ---
+Loaded subject 01 from A01T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 02 from A02T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 03 from A03T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 04 from A04T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 05 from A05T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 06 from A06T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 07 from A07T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 08 from A08T.mat: X=(144, 25, 875), y=[72 72]
+Loaded subject 09 from A09T.mat: X=(144, 25, 875), y=[72 72]
+Subjects loaded: ['01', '02', '03', '04', '05', '06', '07', '08', '09']
+
+
+===== CELL 31 [code] =====
+def make_transfer_split(subjects, target_subject, calibration_trials_per_class=10, test_size=0.5):
+    """
+    Create source training data and target calibration/test data.
+
+    calibration_trials_per_class controls the simulated target-user calibration amount.
+    Example: 10 trials/class is a small calibration set compared with full subject-specific training.
+    """
+    source_X, source_y = [], []
+
+    for subj, item in subjects.items():
+        if subj == target_subject:
+            continue
+        source_X.append(item["X_ea"])
+        source_y.append(item["y"])
+
+    if not source_X:
+        raise ValueError("Need at least one source subject and one target subject.")
+
+    X_source = np.concatenate(source_X, axis=0)
+    y_source = np.concatenate(source_y, axis=0)
+
+    X_target = subjects[target_subject]["X_ea"]
+    y_target = subjects[target_subject]["y"]
+
+    # First create a candidate calibration/test split with stratification.
+    X_cal_pool, X_test, y_cal_pool, y_test = train_test_split(
+        X_target,
+        y_target,
+        test_size=test_size,
+        stratify=y_target,
+        random_state=RANDOM_STATE,
+    )
+
+    # Select a small balanced calibration subset.
+    chosen_idx = []
+    for cls in [0, 1]:
+        idx = np.where(y_cal_pool == cls)[0]
+        n_take = min(calibration_trials_per_class, len(idx))
+        chosen_idx.extend(idx[:n_take])
+
+    chosen_idx = np.array(chosen_idx)
+    X_cal = X_cal_pool[chosen_idx]
+    y_cal = y_cal_pool[chosen_idx]
+
+    return X_source, y_source, X_cal, y_cal, X_test, y_test
+
+
+if len(subjects) >= 2:
+    target_subject = sorted(subjects.keys())[0]
+    X_source, y_source, X_cal, y_cal, X_test, y_test = make_transfer_split(
+        subjects,
+        target_subject=target_subject,
+        calibration_trials_per_class=10,
+    )
+    print("Target subject:", target_subject)
+    print("Source:", X_source.shape, np.bincount(y_source))
+    print("Target calibration:", X_cal.shape, np.bincount(y_cal))
+    print("Target test:", X_test.shape, np.bincount(y_test))
+else:
+    print("Need at least two labelled training subjects to create a transfer split.")
+--- OUTPUT ---
+Target subject: 01
+Source: (1152, 25, 875) [576 576]
+Target calibration: (20, 25, 875) [10 10]
+Target test: (72, 25, 875) [36 36]
+
+
+===== CELL 32 [markdown] =====
+### 4. Compact EEGNet model
+
+This EEGNet implementation follows the compact CNN idea used for EEG-based BCI classification:
+
+- temporal convolution learns frequency-related filters,
+- depthwise spatial convolution learns channel-specific spatial filters,
+- separable convolution reduces parameters,
+- final classifier predicts left vs right hand.
+
+For fine-tuning, we will freeze the lower feature extraction blocks and update only the later adaptation/classification layers.
+
+===== CELL 33 [code] =====
+if TORCH_AVAILABLE:
+    class EEGNet(nn.Module):
+        def __init__(self, n_channels, n_times, n_classes=2, F1=8, D=2, F2=16, dropout=0.5):
+            super().__init__()
+            self.block1 = nn.Sequential(
+                nn.Conv2d(1, F1, kernel_size=(1, 64), padding=(0, 32), bias=False),
+                nn.BatchNorm2d(F1),
+                nn.Conv2d(F1, F1 * D, kernel_size=(n_channels, 1), groups=F1, bias=False),
+                nn.BatchNorm2d(F1 * D),
+                nn.ELU(),
+                nn.AvgPool2d(kernel_size=(1, 4)),
+                nn.Dropout(dropout),
+            )
+            self.block2 = nn.Sequential(
+                nn.Conv2d(F1 * D, F1 * D, kernel_size=(1, 16), padding=(0, 8), groups=F1 * D, bias=False),
+                nn.Conv2d(F1 * D, F2, kernel_size=(1, 1), bias=False),
+                nn.BatchNorm2d(F2),
+                nn.ELU(),
+                nn.AvgPool2d(kernel_size=(1, 8)),
+                nn.Dropout(dropout),
+            )
+
+            with torch.no_grad():
+                dummy = torch.zeros(1, 1, n_channels, n_times)
+                out = self.block2(self.block1(dummy))
+                self.flattened_features = out.numel()
+
+            self.classifier = nn.Linear(self.flattened_features, n_classes)
+
+        def forward(self, x):
+            # x shape: batch x channels x time
+            x = x.unsqueeze(1)  # batch x 1 x channels x time
+            x = self.block1(x)
+            x = self.block2(x)
+            x = x.flatten(start_dim=1)
+            return self.classifier(x)
+
+
+    if len(subjects) >= 2:
+        n_channels = X_source.shape[1]
+        n_times = X_source.shape[2]
+        model = EEGNet(n_channels=n_channels, n_times=n_times).to(DEVICE)
+        print(model)
+        print("Trainable parameters:", sum(p.numel() for p in model.parameters() if p.requires_grad))
+--- OUTPUT ---
+EEGNet(
+  (block1): Sequential(
+    (0): Conv2d(1, 8, kernel_size=(1, 64), stride=(1, 1), padding=(0, 32), bias=False)
+    (1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): Conv2d(8, 16, kernel_size=(25, 1), stride=(1, 1), groups=8, bias=False)
+    (3): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (4): ELU(alpha=1.0)
+    (5): AvgPool2d(kernel_size=(1, 4), stride=(1, 4), padding=0)
+    (6): Dropout(p=0.5, inplace=False)
+  )
+  (block2): Sequential(
+    (0): Conv2d(16, 16, kernel_size=(1, 16), stride=(1, 1), padding=(0, 8), groups=16, bias=False)
+    (1): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (3): ELU(alpha=1.0)
+    (4): AvgPool2d(kernel_size=(1, 8), stride=(1, 8), padding=0)
+    (5): Dropout(p=0.5, inplace=False)
+  )
+  (classifier): Linear(in_features=432, out_features=2, bias=True)
+)
+Trainable parameters: 2370
+
+
+===== CELL 34 [code] =====
+def make_loader(X, y, batch_size=32, shuffle=True):
+    X_t = torch.tensor(X, dtype=torch.float32)
+    y_t = torch.tensor(y, dtype=torch.long)
+    return DataLoader(TensorDataset(X_t, y_t), batch_size=batch_size, shuffle=shuffle)
+
+
+def train_one_phase(model, train_loader, val_loader=None, epochs=20, lr=1e-3):
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr)
+
+    history = {"train_loss": [], "val_acc": []}
+
+    for epoch in range(1, epochs + 1):
+        model.train()
+        losses = []
+
+        for xb, yb in train_loader:
+            xb, yb = xb.to(DEVICE), yb.to(DEVICE)
+            optimizer.zero_grad()
+            logits = model(xb)
+            loss = criterion(logits, yb)
+            loss.backward()
+            optimizer.step()
+            losses.append(loss.item())
+
+        mean_loss = float(np.mean(losses))
+        history["train_loss"].append(mean_loss)
+
+        if val_loader is not None:
+            val_acc = evaluate_accuracy(model, val_loader)
+            history["val_acc"].append(val_acc)
+            print(f"Epoch {epoch:02d}/{epochs} | loss={mean_loss:.4f} | val_acc={val_acc:.3f}")
+        else:
+            print(f"Epoch {epoch:02d}/{epochs} | loss={mean_loss:.4f}")
+
+    return history
+
+
+def evaluate_accuracy(model, loader):
+    model.eval()
+    y_true, y_pred = [], []
+    with torch.no_grad():
+        for xb, yb in loader:
+            xb = xb.to(DEVICE)
+            logits = model(xb)
+            pred = torch.argmax(logits, dim=1).cpu().numpy()
+            y_pred.extend(pred.tolist())
+            y_true.extend(yb.numpy().tolist())
+    return accuracy_score(y_true, y_pred)
+
+
+def predict_labels(model, loader):
+    model.eval()
+    y_true, y_pred = [], []
+    with torch.no_grad():
+        for xb, yb in loader:
+            xb = xb.to(DEVICE)
+            logits = model(xb)
+            pred = torch.argmax(logits, dim=1).cpu().numpy()
+            y_pred.extend(pred.tolist())
+            y_true.extend(yb.numpy().tolist())
+    return np.array(y_true), np.array(y_pred)
+
+===== CELL 35 [markdown] =====
+### 5. Baseline source training
+
+This phase trains EEGNet using all source subjects except the selected target subject. This creates the **pre-trained source model**.
+
+In a full experiment, repeat this by changing the `target_subject` so each subject becomes the target once.
+
+===== CELL 36 [code] =====
+if TORCH_AVAILABLE and len(subjects) >= 2:
+    source_train_loader = make_loader(X_source, y_source, batch_size=32, shuffle=True)
+    target_test_loader = make_loader(X_test, y_test, batch_size=64, shuffle=False)
+
+    source_model = EEGNet(n_channels=X_source.shape[1], n_times=X_source.shape[2]).to(DEVICE)
+
+    print("Training source model...")
+    source_history = train_one_phase(
+        source_model,
+        source_train_loader,
+        val_loader=target_test_loader,
+        epochs=20,
+        lr=1e-3,
+    )
+
+    source_only_acc = evaluate_accuracy(source_model, target_test_loader)
+    print("\nSource-only target test accuracy:", source_only_acc)
+else:
+    print("Skipping training cell because PyTorch or enough subjects are not available.")
+--- OUTPUT ---
+Training source model...
+Epoch 01/20 | loss=0.7028 | val_acc=0.514
+Epoch 02/20 | loss=0.6975 | val_acc=0.458
+Epoch 03/20 | loss=0.6832 | val_acc=0.528
+Epoch 04/20 | loss=0.6778 | val_acc=0.444
+Epoch 05/20 | loss=0.6451 | val_acc=0.458
+Epoch 06/20 | loss=0.6118 | val_acc=0.514
+Epoch 07/20 | loss=0.6017 | val_acc=0.528
+Epoch 08/20 | loss=0.5697 | val_acc=0.528
+Epoch 09/20 | loss=0.5593 | val_acc=0.556
+Epoch 10/20 | loss=0.5517 | val_acc=0.556
+Epoch 11/20 | loss=0.5518 | val_acc=0.556
+Epoch 12/20 | loss=0.5309 | val_acc=0.542
+Epoch 13/20 | loss=0.5415 | val_acc=0.542
+Epoch 14/20 | loss=0.5183 | val_acc=0.542
+Epoch 15/20 | loss=0.4988 | val_acc=0.583
+Epoch 16/20 | loss=0.4947 | val_acc=0.569
+Epoch 17/20 | loss=0.4973 | val_acc=0.583
+Epoch 18/20 | loss=0.4619 | val_acc=0.611
+Epoch 19/20 | loss=0.4596 | val_acc=0.611
+Epoch 20/20 | loss=0.4403 | val_acc=0.597
+
+Source-only target test accuracy: 0.5972222222222222
+
+
+===== CELL 37 [markdown] =====
+### 6. Fine-tuning integration (EA-FT)
+
+Now we apply the proposed **EA-FT** idea:
+
+- use the EA-aligned target calibration data,
+- freeze earlier EEGNet layers to preserve general MI rhythm features,
+- fine-tune only later/adaptation layers and classifier,
+- evaluate on unseen target-subject trials.
+
+This matches the proposal’s idea: **input-level alignment + conservative weight-level adaptation**.
+
+===== CELL 38 [code] =====
+def freeze_for_ea_ft(model, train_block2=True, train_classifier=True):
+    """
+    Freeze Block 1 and fine-tune Block 2 + classifier.
+    This represents conservative layer-wise fine-tuning.
+    """
+    for param in model.parameters():
+        param.requires_grad = False
+
+    if train_block2:
+        for param in model.block2.parameters():
+            param.requires_grad = True
+
+    if train_classifier:
+        for param in model.classifier.parameters():
+            param.requires_grad = True
+
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
+    print(f"Trainable parameters after freezing: {trainable}/{total}")
+    return model
+
+
+if TORCH_AVAILABLE and len(subjects) >= 2:
+    # Copy source model weights into a fine-tuning model
+    ft_model = EEGNet(n_channels=X_source.shape[1], n_times=X_source.shape[2]).to(DEVICE)
+    ft_model.load_state_dict(source_model.state_dict())
+
+    ft_model = freeze_for_ea_ft(ft_model, train_block2=True, train_classifier=True)
+
+    target_cal_loader = make_loader(X_cal, y_cal, batch_size=8, shuffle=True)
+    target_test_loader = make_loader(X_test, y_test, batch_size=64, shuffle=False)
+
+    print("Fine-tuning with small target calibration set...")
+    ft_history = train_one_phase(
+        ft_model,
+        target_cal_loader,
+        val_loader=target_test_loader,
+        epochs=15,
+        lr=5e-5,
+    )
+
+    ea_ft_acc = evaluate_accuracy(ft_model, target_test_loader)
+    print("\nSource-only accuracy:", source_only_acc)
+    print("EA-FT accuracy:", ea_ft_acc)
+else:
+    print("Skipping fine-tuning cell because PyTorch or enough subjects are not available.")
+--- OUTPUT ---
+Trainable parameters after freezing: 1410/2370
+Fine-tuning with small target calibration set...
+Epoch 01/15 | loss=0.5763 | val_acc=0.583
+Epoch 02/15 | loss=0.3982 | val_acc=0.639
+Epoch 03/15 | loss=0.4809 | val_acc=0.667
+Epoch 04/15 | loss=0.3559 | val_acc=0.667
+Epoch 05/15 | loss=0.4889 | val_acc=0.653
+Epoch 06/15 | loss=0.4607 | val_acc=0.667
+Epoch 07/15 | loss=0.4896 | val_acc=0.667
+Epoch 08/15 | loss=0.4480 | val_acc=0.667
+Epoch 09/15 | loss=0.3249 | val_acc=0.639
+Epoch 10/15 | loss=0.5259 | val_acc=0.653
+Epoch 11/15 | loss=0.6525 | val_acc=0.653
+Epoch 12/15 | loss=0.5526 | val_acc=0.653
+Epoch 13/15 | loss=0.6010 | val_acc=0.667
+Epoch 14/15 | loss=0.6577 | val_acc=0.653
+Epoch 15/15 | loss=0.4183 | val_acc=0.667
+
+Source-only accuracy: 0.5972222222222222
+EA-FT accuracy: 0.6666666666666666
+
+
+===== CELL 39 [code] =====
+# Final evaluation report for the research meeting
+if TORCH_AVAILABLE and len(subjects) >= 2:
+    y_true, y_pred = predict_labels(ft_model, target_test_loader)
+
+    print("Classification report after EA-FT:")
+    print(classification_report(y_true, y_pred, target_names=["Left hand", "Right hand"]))
+
+    print("Confusion matrix:")
+    print(confusion_matrix(y_true, y_pred))
+
+    plt.figure(figsize=(5, 4))
+    plt.plot(source_history["train_loss"], label="Source training loss")
+    plt.plot(ft_history["train_loss"], label="Fine-tuning loss")
+    plt.title("EA-FT training progress")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.show()

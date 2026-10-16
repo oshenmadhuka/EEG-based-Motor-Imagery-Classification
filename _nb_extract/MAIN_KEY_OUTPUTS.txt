@@ -1,0 +1,400 @@
+===== CELL 12 OUTPUT =====
+Applying artifact rejection (threshold = 5σ) …
+Subject  Original  Rejected  Kept Rejection %
+    S01       288         1   287        0.3%
+    S02       288         1   287        0.3%
+    S03       288         0   288        0.0%
+    S04       288         4   284        1.4%
+    S05       288         1   287        0.3%
+    S06       288         2   286        0.7%
+    S07       288         1   287        0.3%
+    S08       288         2   286        0.7%
+    S09       288         0   288        0.0%
+
+Mean rejection rate: 0.5%
+
+
+===== CELL 13 OUTPUT =====
+Applying bandpass filter (8–30 Hz, 4th-order Butterworth) …
+  S01 → shape (287, 22, 1000)
+  S02 → shape (287, 22, 1000)
+  S03 → shape (288, 22, 1000)
+  S04 → shape (284, 22, 1000)
+  S05 → shape (287, 22, 1000)
+  S06 → shape (286, 22, 1000)
+  S07 → shape (287, 22, 1000)
+  S08 → shape (286, 22, 1000)
+  S09 → shape (288, 22, 1000)
+
+✓ Bandpass filtering complete.
+
+
+===== CELL 14 OUTPUT =====
+<Figure size 1680x1080 with 3 Axes>
+
+===== CELL 15 OUTPUT =====
+Applying Euclidean Alignment …
+  S01 → EA applied in 143.0 ms | mean |X| before: 3.8205 | after: 0.0247
+  S02 → EA applied in 145.8 ms | mean |X| before: 3.8265 | after: 0.0246
+  S03 → EA applied in 151.6 ms | mean |X| before: 5.0906 | after: 0.0247
+  S04 → EA applied in 143.5 ms | mean |X| before: 3.5243 | after: 0.0248
+  S05 → EA applied in 148.3 ms | mean |X| before: 2.8277 | after: 0.0247
+  S06 → EA applied in 157.8 ms | mean |X| before: 4.9122 | after: 0.0245
+  S07 → EA applied in 152.8 ms | mean |X| before: 3.4302 | after: 0.0246
+  S08 → EA applied in 150.6 ms | mean |X| before: 6.7634 | after: 0.0246
+  S09 → EA applied in 156.5 ms | mean |X| before: 6.7691 | after: 0.0243
+
+✓ EA complete. Mean computation time: 150.0 ms/subject
+  → EA is computationally trivial — suitable for real-time BCI deployment.
+
+
+===== CELL 16 OUTPUT =====
+<Figure size 2640x720 with 18 Axes>
+Alignment Quality — Frobenius distance from Identity Matrix:
+Subject       Before EA     After EA    Reduction
+--------------------------------------------------
+  S01           398.8600       4.6857        98.8%
+  S02           466.7037       4.6857        99.0%
+  S03           791.4666       4.6857        99.4%
+  S04           344.6599       4.6857        98.6%
+  S05           255.0822       4.6857        98.2%
+  S06           626.5875       4.6857        99.3%
+  S07           334.5533       4.6857        98.6%
+  S08          1310.5256       4.6857        99.6%
+  S09          1191.5833       4.6857        99.6%
+
+
+===== CELL 17 OUTPUT =====
+
+
+===== CELL 18 OUTPUT =====
+=======================================================
+  EEGNet Architecture Summary
+=======================================================
+EEGNet(
+  (block1): Sequential(
+    (0): Conv2d(1, 8, kernel_size=(1, 64), stride=(1, 1), padding=(0, 32), bias=False)
+    (1): BatchNorm2d(8, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): Conv2d(8, 16, kernel_size=(22, 1), stride=(1, 1), groups=8, bias=False)
+    (3): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (4): ELU(alpha=1.0)
+    (5): AvgPool2d(kernel_size=(1, 4), stride=(1, 4), padding=0)
+    (6): Dropout(p=0.5, inplace=False)
+  )
+  (block2): Sequential(
+    (0): Conv2d(16, 16, kernel_size=(1, 16), stride=(1, 1), padding=(0, 8), groups=16, bias=False)
+    (1): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+    (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (3): ELU(alpha=1.0)
+    (4): AvgPool2d(kernel_size=(1, 8), stride=(1, 8), padding=0)
+    (5): Dropout(p=0.5, inplace=False)
+  )
+  (classifier): Linear(in_features=496, out_features=2, bias=True)
+)
+=======================================================
+  Total parameters   : 2,450
+  Frozen parameters  : 0
+  Trainable params   : 2,450
+  Flatten size       : 496
+=======================================================
+
+  Forward pass: input (8, 22, 1000) → output (8, 2) ✓
+
+
+===== CELL 19 OUTPUT =====
+Binary dataset (Left Hand vs Right Hand) prepared:
+  S01 | shape: (143, 22, 1000) | Left: 72 | Right: 71
+  S02 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+  S03 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+  S04 | shape: (142, 22, 1000) | Left: 72 | Right: 70
+  S05 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+  S06 | shape: (143, 22, 1000) | Left: 72 | Right: 71
+  S07 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+  S08 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+  S09 | shape: (144, 22, 1000) | Left: 72 | Right: 72
+
+
+===== CELL 20 OUTPUT =====
+Training infrastructure ready.
+  Device: cuda
+
+
+===== CELL 21 OUTPUT =====
+Running Leave-One-Subject-Out pre-training …
+=================================================================
+
+  Target: S01 | Sources: ['S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 65.0%  AUC: 0.839  κ: 0.298
+
+  Target: S02 | Sources: ['S01', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 63.9%  AUC: 0.676  κ: 0.278
+
+  Target: S03 | Sources: ['S01', 'S02', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 90.3%  AUC: 0.960  κ: 0.806
+
+  Target: S04 | Sources: ['S01', 'S02', 'S03', 'S05', 'S06', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 69.0%  AUC: 0.776  κ: 0.382
+
+  Target: S05 | Sources: ['S01', 'S02', 'S03', 'S04', 'S06', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 60.4%  AUC: 0.635  κ: 0.208
+
+  Target: S06 | Sources: ['S01', 'S02', 'S03', 'S04', 'S05', 'S07', 'S08', 'S09']
+  Zero-shot → Acc: 67.1%  AUC: 0.782  κ: 0.343
+
+  Target: S07 | Sources: ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S08', 'S09']
+  Zero-shot → Acc: 63.9%  AUC: 0.695  κ: 0.278
+
+  Target: S08 | Sources: ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S09']
+  Zero-shot → Acc: 85.4%  AUC: 0.953  κ: 0.708
+
+  Target: S09 | Sources: ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08']
+  Zero-shot → Acc: 91.7%  AUC: 0.964  κ: 0.833
+
+  Mean zero-shot accuracy: 73.0%
+
+
+===== CELL 22 OUTPUT =====
+<Figure size 1560x600 with 2 Axes>
+
+===== CELL 23 OUTPUT =====
+
+
+===== CELL 24 OUTPUT =====
+Fine-tuning function defined.
+  Calibration trials : 36 (~4.8 min at 8.03 s/trial, measured)
+  Fine-tune LR       : 5e-05
+  Max epochs         : 30
+  Early-stop patience: 10
+  Model selection    : validation split of calibration data (no test-set leakage)
+
+
+===== CELL 25 OUTPUT =====
+Fine-tuning pre-trained models on each target subject …
+Calibration = 36 trials  ≈ 4.8 min (measured, 8.03 s/trial)
+======================================================================
+Subject      Zero-Shot Acc   After FT Acc      AUC        κ      Δ Acc
+----------------------------------------------------------------------
+  S01                61.7%           70.1%     0.814     0.409       +8.4%
+  S02                66.7%           68.5%     0.720     0.370       +1.9%
+  S03                94.4%           92.6%     0.980     0.851       -1.9%
+  S04                69.8%           71.7%     0.803     0.441       +1.9%
+  S05                61.1%           59.3%     0.606     0.180       -1.9%
+  S06                63.6%           62.6%     0.745     0.255       -0.9%
+  S07                62.0%           63.0%     0.689     0.271       +0.9%
+  S08                82.4%           81.5%     0.954     0.634       -0.9%
+  S09                91.7%           91.7%     0.969     0.833       +0.0%
+----------------------------------------------------------------------
+  MEAN                72.6%           73.4%     0.809     0.471       +0.8%
+
+
+===== CELL 26 OUTPUT =====
+<Figure size 1560x1320 with 9 Axes>
+
+===== CELL 27 OUTPUT =====
+<Figure size 960x840 with 1 Axes>
+
+===== CELL 28 OUTPUT =====
+
+
+===== CELL 29 OUTPUT =====
+Ablation — Baseline (No TL) & FT without EA …
+======================================================================
+  S01 | Baseline:  55.1% | FT w/o EA:  79.4% | Zero-Shot:  61.7% | EA-FT:  70.1%
+  S02 | Baseline:  48.1% | FT w/o EA:  65.7% | Zero-Shot:  66.7% | EA-FT:  68.5%
+  S03 | Baseline:  53.7% | FT w/o EA:  96.3% | Zero-Shot:  94.4% | EA-FT:  92.6%
+  S04 | Baseline:  54.7% | FT w/o EA:  83.0% | Zero-Shot:  69.8% | EA-FT:  71.7%
+  S05 | Baseline:  50.9% | FT w/o EA:  55.6% | Zero-Shot:  61.1% | EA-FT:  59.3%
+  S06 | Baseline:  52.3% | FT w/o EA:  76.6% | Zero-Shot:  63.6% | EA-FT:  62.6%
+  S07 | Baseline:  48.1% | FT w/o EA:  50.0% | Zero-Shot:  62.0% | EA-FT:  63.0%
+  S08 | Baseline:  47.2% | FT w/o EA:  88.9% | Zero-Shot:  82.4% | EA-FT:  81.5%
+  S09 | Baseline:  49.1% | FT w/o EA:  87.0% | Zero-Shot:  91.7% | EA-FT:  91.7%
+
+Ablation Study — Classification Accuracy (%) on Binary MI Task:
+         Baseline\n(No TL)  Zero-Shot\n(No FT)  FT without EA  EA-FT EEGNet\n(Ours)
+Subject                                                                            
+S01                   55.1                61.7           79.4                  70.1
+S02                   48.1                66.7           65.7                  68.5
+S03                   53.7                94.4           96.3                  92.6
+S04                   54.7                69.8           83.0                  71.7
+S05                   50.9                61.1           55.6                  59.3
+S06                   52.3                63.6           76.6                  62.6
+S07                   48.1                62.0           50.0                  63.0
+S08                   47.2                82.4           88.9                  81.5
+S09                   49.1                91.7           87.0                  91.7
+Mean                  51.0                72.6           75.8                  73.4
+Std                    3.0                13.3           15.7                  12.4
+
+
+===== CELL 30 OUTPUT =====
+<Figure size 1920x720 with 2 Axes>
+
+Key findings:
+  Baseline (no TL)      : 51.0%
+  Zero-Shot (no FT)     : 72.6%
+  FT without EA         : 75.8%
+  EA-FT EEGNet (Ours)   : 73.4%
+
+  EA contribution (FT w/o EA → Ours): -2.4%
+
+
+===== CELL 31 OUTPUT =====
+
+
+===== CELL 32 OUTPUT =====
+Zero-shot cross-subject transfer (NO fine-tuning) — same test trials:
+Subject     No EA (%)  With EA (%)   Δ EA (%)
+---------------------------------------------
+S01              72.0         61.7      -10.3
+S02              60.2         66.7       +6.5
+S03              96.3         94.4       -1.9
+S04              65.1         69.8       +4.7
+S05              55.6         61.1       +5.6
+S06              73.8         63.6      -10.3
+S07              49.1         62.0      +13.0
+S08              88.9         82.4       -6.5
+S09              88.0         91.7       +3.7
+---------------------------------------------
+MEAN             72.1         72.6       +0.5
+
+<Figure size 1200x600 with 1 Axes>
+
+→ EA changes zero-shot transfer by +0.5 pts on average (this is the direct test of the 'alignment enables transfer' hypothesis).
+
+
+===== CELL 33 OUTPUT =====
+
+
+===== CELL 34 OUTPUT =====
+Deployment-realistic EA-FT (reference from calibration trials only):
+Subject    Transductive EA-FT   Calib-only EA-FT       Δ
+--------------------------------------------------------
+S01                      70.1               72.9    +2.8
+S02                      68.5               68.5    +0.0
+S03                      92.6               93.5    +0.9
+S04                      71.7               71.7    +0.0
+S05                      59.3               57.4    -1.9
+S06                      62.6               64.5    +1.9
+S07                      63.0               63.0    +0.0
+S08                      81.5               83.3    +1.9
+S09                      91.7               91.7    +0.0
+--------------------------------------------------------
+MEAN                     73.4               74.1    +0.6
+
+========================================================
+  HEADLINE (calibration-only EA, deployable) : 74.1%
+  ORACLE   (transductive EA, upper bound)    : 73.4%
+  Optimism gap (oracle − headline)           : -0.6 pts
+========================================================
+
+→ The 74.1% calibration-only figure is the PRIMARY reported result (no test-data
+  peeking during alignment). The transductive 73.4% is a clearly-labelled oracle
+  upper bound; the gap above quantifies the optimism from aligning on the whole session.
+
+
+===== CELL 35 OUTPUT =====
+Comparison with Literature (BCI Competition IV 2a, Left vs Right MI):
+                                  Mean Acc (%) Calibration Time Parameters           Reference
+Method                                                                                        
+DeepConvNet (no TL)                  62.400000           30 min    170,000  Schirrmeister 2017
+ShallowConvNet (no TL)               64.100000           30 min     44,000  Schirrmeister 2017
+Standard EEGNet (no TL)              65.800000           30 min     ~2,000        Lawhern 2018
+EEGNet + Riemannian Alignment        74.200000           15 min     ~2,000        He & Wu 2020
+EEGNet + Domain Adaptation (MDM)     76.100000           20 min     ~2,000      Barachant 2012
+EA-FT EEGNet (Ours, 36 trials)       73.432208         ~4.8 min     ~2,000           This Work
+
+
+===== CELL 36 OUTPUT =====
+<Figure size 1440x720 with 1 Axes>
+
+===== CELL 37 OUTPUT =====
+
+
+===== CELL 38 OUTPUT =====
+===========================================================================
+  EA-FT EEGNet — Final Results Summary
+===========================================================================
+         Zero-Shot Acc (%)  FT Acc (%)    AUC  Cohen κ  Calib Trials  Trainable Params
+Subject                                                                               
+S01                 61.682      70.093  0.814    0.409          36.0            1538.0
+S02                 66.667      68.519  0.720    0.370          36.0            1538.0
+S03                 94.444      92.593  0.980    0.851          36.0            1538.0
+S04                 69.811      71.698  0.803    0.441          36.0            1538.0
+S05                 61.111      59.259  0.606    0.180          36.0            1538.0
+S06                 63.551      62.617  0.745    0.255          36.0            1538.0
+S07                 62.037      62.963  0.689    0.271          36.0            1538.0
+S08                 82.407      81.481  0.954    0.634          36.0            1538.0
+S09                 91.667      91.667  0.969    0.833          36.0            1538.0
+Mean                72.598      73.432  0.809    0.471          36.0            1538.0
+Std                 13.344      12.400  0.134    0.247           0.0               0.0
+Median              66.667      70.093  0.803    0.409          36.0            1538.0
+===========================================================================
+
+<Figure size 1800x600 with 3 Axes>
+
+===== CELL 39 OUTPUT =====
+========================================================================================
+  Wilcoxon signed-rank tests — EA-FT EEGNet vs baselines (n = 9 subjects)
+  H0: median per-subject accuracy difference (EA-FT − baseline) = 0
+========================================================================================
+                               Median Δ (pts)  Mean Δ (pts) Subjects EA-FT wins     W  p (two-sided)  Effect size r Sig. (α=.05)
+Comparison                                                                                                                      
+EA-FT vs From-scratch (No TL)         16.9811       22.3860                 9/9   0.0         0.0039         1.0000          Yes
+EA-FT vs Zero-shot EA (No FT)          0.0000        0.8346                 4/9  14.0         0.5745         0.2222           No
+EA-FT vs FT without EA                -3.7037       -2.4136                 4/9  15.5         0.4258        -0.3111           No
+========================================================================================
+Note: with n = 9 the smallest attainable two-sided p is ~0.004; a non-significant
+result can reflect limited power (few subjects) as much as a small true effect.
+Δ = accuracy difference in percentage points. Positive Δ favours EA-FT.
+
+
+===== CELL 40 OUTPUT =====
+Accuracy vs calibration size (mean over 9 subjects × 5 repeats):
+ Trials   Minutes  Mean Acc %     Std
+     10      1.34        72.9    12.0
+     18      2.41        73.2    11.9
+     27      3.61        74.4    11.4
+     36      4.82        73.7    11.2
+     54      7.23        74.4    11.2
+     72      9.64        74.4    11.4
+
+<Figure size 1080x600 with 1 Axes>
+
+===== CELL 41 OUTPUT =====
+
+
+===== CELL 42 OUTPUT =====
+<Figure size 1920x1200 with 6 Axes>
+
+✓ All figures saved.
+
+  EA-FT EEGNet — Final Summary:
+  Mean Accuracy  : 73.4%
+  Mean AUC       : 0.809
+  Mean Cohen κ   : 0.471
+  Calibration    : ~4.8 min (36 trials @ 8.03 s/trial, measured)
+  Reduction vs 20–30 min baseline: 76%–84%
+
+
+===== CELL 43 OUTPUT =====
+
+
+===== CELL 44 OUTPUT =====
+Demo artifacts written to D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\results\demo
+  demo_bundle.npz        105.58 MB
+  demo_summary.json        0.00 MB
+  eaft_models.pt           0.15 MB
+
+
+===== CELL 45 OUTPUT =====
+
+
+===== CELL 46 OUTPUT =====
+
+
+===== CELL 47 OUTPUT =====
+
+
+===== CELL 48 OUTPUT =====
+
+
+===== CELL 49 OUTPUT =====

@@ -1,0 +1,67 @@
+[cell 1] Keys: dict_keys(['__header__', '__version__', '__globals__', 'data'])
+[cell 16]   D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\data
+[cell 21] Subject 01: only A01T.mat (missing E)
+[cell 21] Subject 02: only A02T.mat (missing E)
+[cell 21] Subject 03: only A03T.mat (missing E)
+[cell 21] Subject 04: only A04T.mat (missing E)
+[cell 21] Subject 05: only A05T.mat (missing E)
+[cell 21] Subject 06: only A06T.mat (missing E)
+[cell 21] Subject 07: only A07T.mat (missing E)
+[cell 21] Subject 08: only A08T.mat (missing E)
+[cell 21] Subject 09: only A09T.mat (missing E)
+[cell 27] Before EA - average covariance shape: (25, 25)
+[cell 27] After EA  - average covariance shape: (25, 25)
+[cell 27] Mean diagonal after EA: 0.99999505
+[cell 27] Mean absolute off-diagonal after EA: 9.534620893766999e-07
+[cell 30] Loaded subject 01 from A01T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 02 from A02T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 03 from A03T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 04 from A04T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 05 from A05T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 06 from A06T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 07 from A07T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 08 from A08T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Loaded subject 09 from A09T.mat: X=(144, 25, 875), y=[72 72]
+[cell 30] Subjects loaded: ['01', '02', '03', '04', '05', '06', '07', '08', '09']
+[cell 31] Target subject: 01
+[cell 31] Target calibration: (20, 25, 875) [10 10]
+[cell 33]   (classifier): Linear(in_features=432, out_features=2, bias=True)
+[cell 36] Epoch 01/20 | loss=0.7028 | val_acc=0.514
+[cell 36] Epoch 02/20 | loss=0.6975 | val_acc=0.458
+[cell 36] Epoch 03/20 | loss=0.6832 | val_acc=0.528
+[cell 36] Epoch 04/20 | loss=0.6778 | val_acc=0.444
+[cell 36] Epoch 05/20 | loss=0.6451 | val_acc=0.458
+[cell 36] Epoch 06/20 | loss=0.6118 | val_acc=0.514
+[cell 36] Epoch 07/20 | loss=0.6017 | val_acc=0.528
+[cell 36] Epoch 08/20 | loss=0.5697 | val_acc=0.528
+[cell 36] Epoch 09/20 | loss=0.5593 | val_acc=0.556
+[cell 36] Epoch 10/20 | loss=0.5517 | val_acc=0.556
+[cell 36] Epoch 11/20 | loss=0.5518 | val_acc=0.556
+[cell 36] Epoch 12/20 | loss=0.5309 | val_acc=0.542
+[cell 36] Epoch 13/20 | loss=0.5415 | val_acc=0.542
+[cell 36] Epoch 14/20 | loss=0.5183 | val_acc=0.542
+[cell 36] Epoch 15/20 | loss=0.4988 | val_acc=0.583
+[cell 36] Epoch 16/20 | loss=0.4947 | val_acc=0.569
+[cell 36] Epoch 17/20 | loss=0.4973 | val_acc=0.583
+[cell 36] Epoch 18/20 | loss=0.4619 | val_acc=0.611
+[cell 36] Epoch 19/20 | loss=0.4596 | val_acc=0.611
+[cell 36] Epoch 20/20 | loss=0.4403 | val_acc=0.597
+[cell 36] Source-only target test accuracy: 0.5972222222222222
+[cell 38] Fine-tuning with small target calibration set...
+[cell 38] Epoch 01/15 | loss=0.5763 | val_acc=0.583
+[cell 38] Epoch 02/15 | loss=0.3982 | val_acc=0.639
+[cell 38] Epoch 03/15 | loss=0.4809 | val_acc=0.667
+[cell 38] Epoch 04/15 | loss=0.3559 | val_acc=0.667
+[cell 38] Epoch 05/15 | loss=0.4889 | val_acc=0.653
+[cell 38] Epoch 06/15 | loss=0.4607 | val_acc=0.667
+[cell 38] Epoch 07/15 | loss=0.4896 | val_acc=0.667
+[cell 38] Epoch 08/15 | loss=0.4480 | val_acc=0.667
+[cell 38] Epoch 09/15 | loss=0.3249 | val_acc=0.639
+[cell 38] Epoch 10/15 | loss=0.5259 | val_acc=0.653
+[cell 38] Epoch 11/15 | loss=0.6525 | val_acc=0.653
+[cell 38] Epoch 12/15 | loss=0.5526 | val_acc=0.653
+[cell 38] Epoch 13/15 | loss=0.6010 | val_acc=0.667
+[cell 38] Epoch 14/15 | loss=0.6577 | val_acc=0.653
+[cell 38] Epoch 15/15 | loss=0.4183 | val_acc=0.667
+[cell 38] Source-only accuracy: 0.5972222222222222
+[cell 38] EA-FT accuracy: 0.6666666666666666

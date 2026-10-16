@@ -1,0 +1,15 @@
+CELL 45 type=markdown n_outputs=0 exec=None
+SRC_HEAD: ## 11. Secondary-Dataset Validation — OpenBMI (Lee2019_MI) <a id='11'></a> |  | Sections 2–9 develop and report the framework on our **primary dataset (BCI Competition IV 2a)**. | To show the pipeline is not over-fit to one recording setup, we add an **independent | secondary evaluation on the OpenBMI / Lee2019_MI dataset** (Lee et al., 2019) — recorded on | *different hardware, different subjects, a different montage and a different sampling rate*. |  | **Scope (one subject, no download).** OpenBMI is large 
+---
+CELL 46 type=code n_outputs=0 exec=None
+SRC_HEAD: # ═══════════════════════════════════════════════════════════════════════════════ | # 11.1  Load OpenBMI (Lee2019_MI) — ONE subject, from the LOCAL file (no download) | # ═══════════════════════════════════════════════════════════════════════════════ | from scipy.signal import resample_poly |  | # Path to the manually-downloaded OpenBMI subject file (session 1, subject 1). | OPENBMI_DIR    = Path(r'D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\openBMI dataset') | OPENBMI_FILE   = 
+---
+CELL 47 type=code n_outputs=0 exec=None
+SRC_HEAD: # ═══════════════════════════════════════════════════════════════════════════════ | # 11.2  Harmonise to our 22-channel montage + SAME pre-processing as 2a (Section 4) | # ═══════════════════════════════════════════════════════════════════════════════ | # The 2a-pretrained EEGNet expects the 22 sensorimotor channels of CH_NAMES, in order. | # OpenBMI provides all of them EXCEPT FCz, which we reconstruct as the mean of its | # nearest neighbours (Fz, FC1, FC2, Cz) so the tensor stays (N, 22, T) in the same
+---
+CELL 48 type=code n_outputs=0 exec=None
+SRC_HEAD: # ═══════════════════════════════════════════════════════════════════════════════ | # 11.3  Cross-dataset EA-FT  —  source = all 9 BCI 2a subjects, target = OpenBMI subj | # ═══════════════════════════════════════════════════════════════════════════════ | # Same functions as Sections 5–7. We pre-train ONE EA-EEGNet on ALL nine 2a subjects | # (none held out, because the target now comes from a DIFFERENT dataset), then apply | # the deployable calibration-only EA-FT protocol to the OpenBMI subject. | print("
+---
+CELL 49 type=code n_outputs=0 exec=None
+SRC_HEAD: # ═══════════════════════════════════════════════════════════════════════════════ | # 11.4  OpenBMI result — confusion matrix + primary-vs-secondary comparison | # ═══════════════════════════════════════════════════════════════════════════════ | fig, axes = plt.subplots(1, 2, figsize=(13, 5)) | fig.suptitle('Secondary-Dataset Validation — OpenBMI (Lee2019_MI), single subject', |              fontweight='bold', fontsize=12) |  | # Confusion matrix (headline calibration-only EA-FT) | y_pred  = (openbmi_results['y
+---

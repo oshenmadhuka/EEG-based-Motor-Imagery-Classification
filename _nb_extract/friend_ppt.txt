@@ -1,0 +1,375 @@
+\n===== PAGE 1 =====\nNoise-Assisted Photonic Quantum
+Machine Learning
+CM4900 - Research Project in Artif icial Intelligence
+Thesis Presentation
+A.M.A.S.D. Alagiyawanna
+215506J
+Senior Professor Asoka Karunananda
+Department of Computational Mathematics
+BSc Hons in Artif icial Intelligence
+2026/08/03
+Batch 21
+\n===== PAGE 2 =====\nOutline
+1.Introduction
+2.Objectives
+3.Literature Review
+4.Research Gap
+5.Technology
+6.Novel Approach
+7.Design
+8.Implementation
+9.Evaluation
+10.Conclusion and Further Work
+11.References
+\n===== PAGE 3 =====\nNoise directly
+impacts PQML
+training stability
+Classical ML limitations:
+High computational cost 
+Poor scalability 
+Data inefficiency
+Limited interpretability
+Quantum Computing offers:
+Superposition
+Entanglement
+Quantum parallelism
+Photonic Quantum Computing:
+Operates at room temperature
+Promising platform for Scalable
+quantum systems
+Introduction
+The Quantum-Classical Frontier
+\n===== PAGE 4 =====\nObjectives
+Critical reviews of:
+Photonic quantum computing
+Noise-assisted learning models
+In-depth analysis of:
+PQML Methods and identify research gaps
+Develop:
+A noise-assisted photonic quantum machine
+learning algorithm to address these gaps
+Evaluate:
+Robustness and performance against noise-free
+quantum baselines and contribution to AI
+\n===== PAGE 5 =====\n1985
+Existing Approaches
+Goal
+Hardware
+Reduce noise
+Encoding
+Correct noise
+Algorithms
+Mitigate noise
+Hybrid
+Compensate noise
+Literature Review
+Evolution of PQML
+Noise Mitigation Techniques
+Existing PQML
+research treats
+noise as a problem
+to be eliminated
+Table 1: Existing Approaches and Goals
+\n===== PAGE 6 =====\nLiterature Review
+Recent Advances and Remaining Challenges
+Key Challenges Identified in Literature:
+Assumes stable and predictable noise 
+Suppresses rather than exploits noise
+No learnable-noise framework
+2016: 1M-mode photonic cluster states [3]
+2021: Programmable photonic processors [6]
+2023: Feedforward PQNN [5]
+2024: Superconducting hybrid photonic chips [7]
+These limitations
+motivate the proposed
+Noise-Assisted PQML
+framework
+Figure 1: XANANDU Programmable Quantum Processor
+\n===== PAGE 7 =====\nUse noise constructively
+Adapts to dynamic noise
+Joint optimisation of circuit +
+noise
+Noise as a learnable parameter
+Noise LEVERAGING
+(Novel)
+Noise SUPPRESSION
+(Existing)
+Eliminate or correct noise
+Assumes stable noise models
+Adds computational overhead
+Fails in dynamic real-world
+environments
+Research Gap
+Noise as a Learning Resource
+Figure 2: Noise suppression vs. noise leveraging [8]
+Research Gap: No existing PQML framework that jointly optimizes photonic circuit parameters and
+environmental phase noise.
+\n===== PAGE 8 =====\nVariational Photonic Quantum Circuits (VPQCs)
+Technology
+Theoretical Foundations
+Figure 3: Trainable photonic quantum circuit
+Noise Channels
+Noise is modelled via CPTP maps (Kraus
+operators) [9]
+Photon loss (η) and phase diffusion (σφ) are
+incorporated as learnable parameters.
+Environment-Assisted Quantum Transport 
+Figure 4: A diagram of photosynthetic energy transport [10]
+Hybrid Quantum-Classical Optimization
+Jointly optimize circuit + noise parameters
+L-BFGS-B + BCE
+Noise is not removed — it is learned and exploited
+\n===== PAGE 9 =====\nNovel Approach
+Noise-Assisted Photonic Quantum Learning Framework (NA-PQML)
+Hypothesis: Controlled, trainable phase noise improves learning and
+predictive performance of PQML Models
+Figure 5: Workflow of the developed Noise-Assisted Photonic Quantum Machine Learning (NA-PQML) framework.
+\n===== PAGE 10 =====\nFigure 6: Top-Level Architecture Diagram
+Design
+\n===== PAGE 11 =====\nImplementation
+Figure 7: Full Workflow Diagram
+\n===== PAGE 12 =====\nData Preprocessing:
+PCA (2 - 4D) + Scaling + Splits
+Quantum Encoding:
+Amplitude + Phase encoding (CV modes)
+Quantum Circuit:
+Rotation → Squeezing
+Beamsplitters → Displacement
+Noise Module:
+Learnable phase noise
+Training Module:
+Joint optimization (θ, λ): L-BFGS-B + BCE + L2
+Evaluation Module:
+Accuracy, F1, AUC-ROC
+Implementation
+Module-wise Development
+Figure 8: VPQC with learnable noise (2 layers, 4 modes)
+\n===== PAGE 13 =====\nAspect
+Simulated Model
+Strawberry Fields (SF) [11]
+State Representation
+Mean vector only
+Full Gaussian state
+Photon Loss
+Parameterized scaling
+Physical LossChannel(η)
+Phase Noise
+Custom perturbation
+Gaussian phase diffusion
+Environment Modeling
+Not included
+Vacuum bath coupling
+Covariance Tracking
+No
+Yes
+Primary Purpose
+Fast prototyping & training
+Physical photonic validation
+Two implementations were developed to validate both ML-level noise behavior and
+realistic photonic quantum dynamics
+Dual Implementation Framework
+Validation Across Simulated and Physical Photonic Models
+Table 2: Comparison of Simulated Model and SF model
+\n===== PAGE 14 =====\nDataset
+Classification Task
+Input
+Dimension
+Samples
+per class
+Characteristics
+Breast Cancer
+Benign vs. Malignant
+4 (PCA)
+200 Binary, Balanced,
+low complexity
+Fashion-MNIST Binary classification (T-
+shirt vs Shirt)
+2 (PCA)
+7,000 Balanced, low
+complexity
+Fashion-MNIST Binary classification (T-
+shirt vs Shirt)
+4 (PCA)
+7,000 Balanced, medium
+complexity
+CIFAR-10
+Small
+Binary classification
+(Airplane vs Automobile)
+4 (PCA)
+2,000 Balanced, high
+complexity
+CIFAR-10 Full
+Binary classification
+(Airplane vs Automobile)
+4 (PCA)
+5,000 Balanced, very high
+complexity
+Datasets
+Breast Cancer
+Fashion-MNIST
+CIFAR-10 Small
+CIFAR-10 Full
+Dual Frameworks
+Hardcoded Simulator
+Strawberry Fields
+Evaluation metrics
+Accuracy
+AUC
+F1
+Evaluation
+Experimental Design
+Table 3: Summery of Datasets
+\n===== PAGE 15 =====\nEvaluation
+Evaluation I: Phase Noise Sensitivity Analysis
+Figure 9: Accuracy vs Phase Noise
+Figure 10: AUC vs Phase Noise
+Peak performance occurs within σφ = 0.01–0.04
+σφ = 0.02 selected as the optimal value
+\n===== PAGE 16 =====\nMetric
+Baseline (Mean ± Std.)
+Noise (Mean ± Std.)
+Accuracy
+0.7503 ± 0.0277
+0.7552 ± 0.0280
+F1 Score
+0.7319 ± 0.0321
+0.7342 ± 0.0313
+AUC-ROC
+0.8331 ± 0.0232
+0.8349 ± 0.0237
+Evaluation
+Evaluation II: Stability Under Random Initialization
+Stable performance across 10 random seeds (Std. ≈ 0.02–0.03)
+Consistent improvements confirm high reproducibility
+Table 4: Summery Results of Seed Test
+\n===== PAGE 17 =====\nDataset
+Baseline
+Accuracy
+Noise
+Accuracy
+Δ Accuracy
+Δ AUC
+Breast Cancer
+94.30%
+92.20%
+-2.10%
+-0.0196
+Fashion MNIST (2D)
+76.80%
+75.50%
+-1.30%
+-0.0045
+Fashion MNIST (4D)
+77.90%
+78.60%
+0.80%
+0.0185
+CIFAR-10 Small
+70.60%
+73.20%
+2.60%
+0.0271
+CIFAR-10 Full
+72.60%
+73.30%
+0.60%
+0.0227
+Dataset
+Baseline
+Accuracy
+Noise
+Accuracy
+Δ Accuracy
+Δ AUC
+Breast Cancer
+92.30%
+92.30%
+0.00%
+0
+Fashion MNIST (2D)
+79.40%
+80.10%
+0.70%
+~0.000
+Fashion MNIST (4D)
+79.00%
+79.00%
+~0.0%
+0.001
+CIFAR-10 Small
+71.00%
+72.80%
+1.80%
+0.035
+CIFAR-10 Full
+66.50%
+67.80%
+1.30%
+0.015
+Evaluation
+Evaluation III: Performance Evaluation Across Dataset Complexity
+Figure 11: Accuracy & AUC on Simulated Circuit
+Figure 12: Accuracy & AUC on Strawberry Fields
+\n===== PAGE 18 =====\nEvaluation
+Evaluation III: Performance Evaluation Across Dataset Complexity
+Figure 13: Performance comparison of across different dataset complexity levels
+Performance gains increase with dataset complexity, especially on CIFAR-10 datasets
+Noise-assisted PQML achieves higher Accuracy and AUC on complex classification tasks
+\n===== PAGE 19 =====\nEvaluation
+Evaluation VI: Adaptive Learning of Optical Parameters
+Figure 14: Evolution of the trainable optical parameters
+First optical layer adapted significantly (η₁: 0.89 → 0.69; σφ: 0.02 → ~0.18), while the second layer
+remained nearly unchanged
+Phase noise converged within the first 10–20 epochs, confirming stable adaptive learning and selective
+parameter optimization
+\n===== PAGE 20 =====\nHypothesis & Objectives
+Conclusion and Further Work
+Key Results
+Hypothesis validated: Adaptive phase
+noise improved PQML performance
+All research objectives were
+successfully achieved
+Objective-wise Achievements
+Limitations → Future Work
+Simulation only → Validate on
+photonic hardware
+Limited datasets → Evaluate
+on larger, multi-class datasets
+O1: Studied photonic QML and phase noise
+O2: Developed the NA-PQML framework
+O3: Implemented and evaluated the framework
+O4: Improved robustness and classification
+performance
+Optimal phase noise: σφ = 0.02
+Accuracy improvement: up to +2.6%
+AUC improvement: up to +0.035
+Stable across 10 random seeds
+Stable adaptive learning with noise
+Adaptive phase noise is a useful computational resource for robust photonic quantum machine learning
+\n===== PAGE 21 =====\nReferences
+[1] D. Deutsch, “Quantum theory, the Church–Turing principle and the universal quantum computer,” Proceedings of the
+Royal Society of London. A. Mathematical and Physical Sciences, vol. 400, no. 1818, pp. 97–117, Jul. 1985, doi:
+10.1098/rspa.1985.0070. 
+[2] S. C. Kak, “Quantum Neural Computing,” in Advances in Imaging and Electron Physics, vol. 94, Elsevier, 1995, pp.
+259–313. doi: 10.1016/S1076-5670(08)70147-2. 
+[3] J. Yoshikawa et al., “Invited Article: Generation of one-million-mode continuous-variable cluster state by unlimited
+time-domain multiplexing,” APL Photonics, vol. 1, no. 6, p. 060801, Sep. 2016, doi: 10.1063/1.4962732. 
+[4] J. M. Arrazola et al., “Quantum circuits with many photons on a programmable nanophotonic chip,” Nature, vol. 591,
+no. 7848, pp. 54–60, Mar. 2021, doi: 10.1038/s41586-021-03202-1. 
+[5] S. Pai et al., “Power monitoring in a feedforward photonic network using two output detectors,” Nanophotonics, vol.
+12, no. 5, pp. 985–991, Mar. 2023, doi: 10.1515/nanoph-2022-0527. 
+[6] Arrazola, J., et al. "Quantum circuits with many photons on a programmable nanophotonic chip," in Nature, vol. 591,
+no. 7848, pp. 54–60, 2021.
+[7] Lee, J., et al. "Fault-tolerant quantum computation by hybrid qubits with bosonic cat code and single photons," in
+PRX Quantum, vol. 5, no. 3, pp. 030322, 2024.
+[8] R. P. Bhalerao, “Getting it right: suppression and leveraging of noise in robust decision-making,” Quant Plant Bio.,
+vol. 5, p. e10, 2024, doi: 10.1017/qpb.2024.10. 
+[9] J. X. Cui, T. Zhou, and G. L. Long, “An optimal expression of a Kraus operator as a linear combination of unitary
+matrices,” J. Phys. A: Math. Theor., vol. 45, no. 44, p. 444011, Nov. 2012, doi: 10.1088/1751-8113/45/44/444011. 
+[10] P. Rebentrost, M. Mohseni, I. Kassal, S. Lloyd, and A. Aspuru-Guzik, “Environment-assisted quantum transport,”
+New J. Phys., vol. 11, no. 3, p. 033003, Mar. 2009, doi: 10.1088/1367-2630/11/3/033003. 
+[11] Killoran, N., et al. "Strawberry Fields: A Software Platform for Photonic Quantum Computing," in Quantum, vol. 3,
+pp. 129, 2019.
+\n===== PAGE 22 =====\nQ & A
+\n===== PAGE 23 =====\nThank You!

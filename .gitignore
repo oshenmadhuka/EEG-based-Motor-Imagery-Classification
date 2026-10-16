@@ -1,0 +1,19 @@
+# ---------------------------------------------------------------------------
+# EEG datasets — keep local only; do not commit or push
+# ---------------------------------------------------------------------------
+# BCI Competition IV 2a (Graz): A01T.mat … A09T.mat, A*E.mat
+/data/
+
+# OpenBMI / Lee2019 MI (e.g. sess01_subj01_EEG_MI.mat)
+/openBMI dataset/
+
+# Catch stray MATLAB exports outside those folders
+*.mat
+
+# Large demo artifacts (regenerate via notebook Section 10 or train scripts)
+/results/demo/demo_bundle.npz
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/

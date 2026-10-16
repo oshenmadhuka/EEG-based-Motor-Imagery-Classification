@@ -1,0 +1,323 @@
+{
+  "mean_acc": 73.43220834031783,
+  "mean_auc": 0.8089675036022741,
+  "mean_kappa": 0.47145809053213344,
+  "headline_acc": 74.1,
+  "headline_auc": 0.809,
+  "headline_kappa": 0.471,
+  "calib_trials": 36,
+  "calib_minutes": 4.82,
+  "sec_per_trial": 8.032,
+  "per_subject_acc": {
+    "S01": 70.09345794392523,
+    "S02": 68.51851851851852,
+    "S03": 92.5925925925926,
+    "S04": 71.69811320754717,
+    "S05": 59.25925925925925,
+    "S06": 62.616822429906534,
+    "S07": 62.96296296296296,
+    "S08": 81.48148148148148,
+    "S09": 91.66666666666666,
+    "OB01": 54.6875
+  },
+  "per_subject_detail": {
+    "S01": {
+      "zero_shot": 61.682,
+      "ft_acc": 70.093,
+      "auc": 0.814,
+      "kappa": 0.409
+    },
+    "S02": {
+      "zero_shot": 66.667,
+      "ft_acc": 68.519,
+      "auc": 0.72,
+      "kappa": 0.37
+    },
+    "S03": {
+      "zero_shot": 94.444,
+      "ft_acc": 92.593,
+      "auc": 0.98,
+      "kappa": 0.851
+    },
+    "S04": {
+      "zero_shot": 69.811,
+      "ft_acc": 71.698,
+      "auc": 0.803,
+      "kappa": 0.441
+    },
+    "S05": {
+      "zero_shot": 61.111,
+      "ft_acc": 59.259,
+      "auc": 0.606,
+      "kappa": 0.18
+    },
+    "S06": {
+      "zero_shot": 63.551,
+      "ft_acc": 62.617,
+      "auc": 0.745,
+      "kappa": 0.255
+    },
+    "S07": {
+      "zero_shot": 62.037,
+      "ft_acc": 62.963,
+      "auc": 0.689,
+      "kappa": 0.271
+    },
+    "S08": {
+      "zero_shot": 82.407,
+      "ft_acc": 81.481,
+      "auc": 0.954,
+      "kappa": 0.634
+    },
+    "S09": {
+      "zero_shot": 91.667,
+      "ft_acc": 91.667,
+      "auc": 0.969,
+      "kappa": 0.833
+    },
+    "OB01": {
+      "zero_shot": 54.6875,
+      "ft_acc": 54.6875,
+      "auc": 0.7172619047619048,
+      "kappa": 0.13108614232209737
+    }
+  },
+  "ablation": {
+    "S01": {
+      "baseline": 55.1,
+      "zero_shot": 61.7,
+      "ft_no_ea": 79.4,
+      "ea_ft": 70.1
+    },
+    "S02": {
+      "baseline": 48.1,
+      "zero_shot": 66.7,
+      "ft_no_ea": 65.7,
+      "ea_ft": 68.5
+    },
+    "S03": {
+      "baseline": 53.7,
+      "zero_shot": 94.4,
+      "ft_no_ea": 96.3,
+      "ea_ft": 92.6
+    },
+    "S04": {
+      "baseline": 54.7,
+      "zero_shot": 69.8,
+      "ft_no_ea": 83.0,
+      "ea_ft": 71.7
+    },
+    "S05": {
+      "baseline": 50.9,
+      "zero_shot": 61.1,
+      "ft_no_ea": 55.6,
+      "ea_ft": 59.3
+    },
+    "S06": {
+      "baseline": 52.3,
+      "zero_shot": 63.6,
+      "ft_no_ea": 76.6,
+      "ea_ft": 62.6
+    },
+    "S07": {
+      "baseline": 48.1,
+      "zero_shot": 62.0,
+      "ft_no_ea": 50.0,
+      "ea_ft": 63.0
+    },
+    "S08": {
+      "baseline": 47.2,
+      "zero_shot": 82.4,
+      "ft_no_ea": 88.9,
+      "ea_ft": 81.5
+    },
+    "S09": {
+      "baseline": 49.1,
+      "zero_shot": 91.7,
+      "ft_no_ea": 87.0,
+      "ea_ft": 91.7
+    }
+  },
+  "ablation_mean": {
+    "baseline": 51.0,
+    "zero_shot": 72.6,
+    "ft_no_ea": 75.8,
+    "ea_ft": 73.4
+  },
+  "calib_only_ea_ft": {
+    "S01": 72.9,
+    "S02": 68.5,
+    "S03": 93.5,
+    "S04": 71.7,
+    "S05": 57.4,
+    "S06": 64.5,
+    "S07": 63.0,
+    "S08": 83.3,
+    "S09": 91.7,
+    "OB01": 54.6875
+  },
+  "calib_size_curve": [
+    {
+      "trials": 10,
+      "minutes": 1.34,
+      "mean_acc": 72.9,
+      "std": 12.0
+    },
+    {
+      "trials": 18,
+      "minutes": 2.41,
+      "mean_acc": 73.2,
+      "std": 11.9
+    },
+    {
+      "trials": 27,
+      "minutes": 3.61,
+      "mean_acc": 74.4,
+      "std": 11.4
+    },
+    {
+      "trials": 36,
+      "minutes": 4.82,
+      "mean_acc": 73.7,
+      "std": 11.2
+    },
+    {
+      "trials": 54,
+      "minutes": 7.23,
+      "mean_acc": 74.4,
+      "std": 11.2
+    },
+    {
+      "trials": 72,
+      "minutes": 9.64,
+      "mean_acc": 74.4,
+      "std": 11.4
+    }
+  ],
+  "literature": [
+    {
+      "method": "DeepConvNet (no TL)",
+      "acc": 62.4,
+      "calib_min": 30,
+      "params": "170,000",
+      "ref": "Schirrmeister 2017"
+    },
+    {
+      "method": "ShallowConvNet (no TL)",
+      "acc": 64.1,
+      "calib_min": 30,
+      "params": "44,000",
+      "ref": "Schirrmeister 2017"
+    },
+    {
+      "method": "Standard EEGNet (no TL)",
+      "acc": 65.8,
+      "calib_min": 30,
+      "params": "~2,000",
+      "ref": "Lawhern 2018"
+    },
+    {
+      "method": "EEGNet + Riemannian Alignment",
+      "acc": 74.2,
+      "calib_min": 15,
+      "params": "~2,000",
+      "ref": "He & Wu 2020"
+    },
+    {
+      "method": "EEGNet + Domain Adaptation (MDM)",
+      "acc": 76.1,
+      "calib_min": 20,
+      "params": "~2,000",
+      "ref": "Barachant 2012"
+    },
+    {
+      "method": "EA-FT EEGNet (Ours)",
+      "acc": 74.1,
+      "calib_min": 4.82,
+      "params": "~2,000",
+      "ref": "This work"
+    }
+  ],
+  "wilcoxon": [
+    {
+      "comparison": "EA-FT vs From-scratch (No TL)",
+      "mean_delta": 22.386,
+      "wins": "9/9",
+      "p": 0.0039,
+      "significant": true
+    },
+    {
+      "comparison": "EA-FT vs Zero-shot EA (No FT)",
+      "mean_delta": 0.835,
+      "wins": "4/9",
+      "p": 0.5745,
+      "significant": false
+    },
+    {
+      "comparison": "EA-FT vs FT without EA",
+      "mean_delta": -2.414,
+      "wins": "4/9",
+      "p": 0.4258,
+      "significant": false
+    }
+  ],
+  "subject_meta": {
+    "OB01": {
+      "dataset": "OpenBMI / Lee2019_MI",
+      "label": "OB01 (OpenBMI)",
+      "file": "sess01_subj01_EEG_MI.mat"
+    },
+    "S01": {
+      "dataset": "BCI IV 2a",
+      "label": "S01"
+    },
+    "S02": {
+      "dataset": "BCI IV 2a",
+      "label": "S02"
+    },
+    "S03": {
+      "dataset": "BCI IV 2a",
+      "label": "S03"
+    },
+    "S04": {
+      "dataset": "BCI IV 2a",
+      "label": "S04"
+    },
+    "S05": {
+      "dataset": "BCI IV 2a",
+      "label": "S05"
+    },
+    "S06": {
+      "dataset": "BCI IV 2a",
+      "label": "S06"
+    },
+    "S07": {
+      "dataset": "BCI IV 2a",
+      "label": "S07"
+    },
+    "S08": {
+      "dataset": "BCI IV 2a",
+      "label": "S08"
+    },
+    "S09": {
+      "dataset": "BCI IV 2a",
+      "label": "S09"
+    }
+  },
+  "openbmi": {
+    "target": "OB01",
+    "dataset": "OpenBMI / Lee2019_MI",
+    "file": "sess01_subj01_EEG_MI.mat",
+    "n_trials_clean": 100,
+    "n_calib": 36,
+    "n_test": 64,
+    "zero_shot_acc": 0.546875,
+    "zero_shot_auc": 0.7172619047619048,
+    "ea_ft_calib_acc": 0.546875,
+    "ea_ft_calib_auc": 0.7172619047619048,
+    "ea_ft_calib_kappa": 0.13108614232209737,
+    "ea_ft_transductive_acc": 0.53125,
+    "ea_ft_transductive_auc": 0.7152777777777778,
+    "ea_ft_transductive_kappa": 0.11111111111111116
+  }
+}

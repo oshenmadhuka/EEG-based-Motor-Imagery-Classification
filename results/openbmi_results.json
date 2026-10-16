@@ -1,0 +1,16 @@
+{
+  "target": "OB01",
+  "dataset": "OpenBMI / Lee2019_MI",
+  "file": "sess01_subj01_EEG_MI.mat",
+  "n_trials_clean": 100,
+  "n_calib": 36,
+  "n_test": 64,
+  "zero_shot_acc": 0.546875,
+  "zero_shot_auc": 0.7172619047619048,
+  "ea_ft_calib_acc": 0.546875,
+  "ea_ft_calib_auc": 0.7172619047619048,
+  "ea_ft_calib_kappa": 0.13108614232209737,
+  "ea_ft_transductive_acc": 0.53125,
+  "ea_ft_transductive_auc": 0.7152777777777778,
+  "ea_ft_transductive_kappa": 0.11111111111111116
+}

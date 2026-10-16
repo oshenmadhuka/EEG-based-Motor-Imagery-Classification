@@ -1,0 +1,197 @@
+===== CELL 0 [markdown] =====
+Dataset overview
+
+**Goal:** Understand structure. You can tell your supervisor: the file organizes **multiple sessions** (columns in `data['data']`), each with continuous EEG and metadata.
+
+
+===== CELL 1 [code] =====
+from scipy.io import loadmat
+
+data = loadmat("../data/A01T.mat")
+
+print("Keys:", data.keys())
+print("Shape of data:", data["data"].shape)
+--- OUTPUT ---
+Keys: dict_keys(['__header__', '__version__', '__globals__', 'data'])
+Shape of data: (1, 9)
+
+
+===== CELL 2 [markdown] =====
+Explore one session
+
+**Fields:**
+- **X** — continuous EEG (time × channels)
+- **y** — trial labels
+- **trial** — sample indices where each trial starts
+- **fs** — sampling rate (Hz)
+- **classes** — text names for class ids
+
+
+===== CELL 4 [markdown] =====
+**Explain:** EEG matrix **X** is **time samples × channels** (here 25 EEG channels). **fs = 250 Hz** means 250 samples per second. Labels **y** and **trial** may be empty for some sessions (e.g. practice runs).
+
+
+===== CELL 6 [markdown] =====
+EEG is **noisy**; amplitude fluctuates with brain activity, muscle, line noise, etc.
+
+
+===== CELL 8 [markdown] =====
+List sessions and find one where **y** and **trial** are non-empty so you can segment trials.
+
+
+===== CELL 10 [markdown] =====
+Extract one trial
+
+Use a session index that has labels (from Step 5). The template used **column 3**; if your printout shows another column with non-empty `y`, change the index to match.
+
+Below we also set `valid_session_idx` to the **first** session with at least one label so the same notebook works across files without manual guessing.
+
+
+===== CELL 11 [code] =====
+valid_session_idx = None
+for i in range(data["data"].shape[1]):
+    s = data["data"][0, i]
+    y_s = s["y"][0, 0]
+    if y_s.size > 0:
+        valid_session_idx = i
+        break
+
+if valid_session_idx is None:
+    raise ValueError("No session with labels found — check .mat file.")
+
+# Original template: session = data['data'][0, 3]
+session = data["data"][0, valid_session_idx]
+
+X = session["X"][0, 0]
+y = session["y"][0, 0]
+trial = session["trial"][0, 0]
+
+fs = int(session["fs"][0, 0].squeeze())
+window = 4 * fs
+
+start = int(trial[0][0])
+end = start + window
+
+trial_signal = X[start:end, :]
+label = int(y[0][0])
+
+print("Using session index:", valid_session_idx)
+print("Trial shape:", trial_signal.shape)
+print("Label:", label)
+--- OUTPUT ---
+Using session index: 3
+Trial shape: (1000, 25)
+Label: 4
+
+
+===== CELL 12 [markdown] =====
+Visualize one trial
+
+
+===== CELL 14 [markdown] =====
+The full 2a task has four classes (**1 = left**, **2 = right**, **3 = feet**, **4 = tongue**); the `classes` field in the file lists all four. **This research uses only left vs right hand**: the training code in `src/load_data.py` keeps trials with labels 1 and 2 only and maps them to **0 = left**, **1 = right**. Raw left vs right traces can still look similar; filtering + models (EEGNet) help.
+
+
+===== CELL 15 [code] =====
+session = data["data"][0, valid_session_idx]
+X = session["X"][0, 0]
+y = session["y"][0, 0]
+trial = session["trial"][0, 0]
+fs = int(session["fs"][0, 0].squeeze())
+window = 4 * fs
+
+left_trials = []
+right_trials = []
+
+for i in range(len(trial)):
+    start = int(trial[i][0])
+    end = start + window
+
+    if end <= X.shape[0]:
+        segment = X[start:end, :]
+        label = int(y[i][0])
+
+        if label == 1:
+            left_trials.append(segment)
+        elif label == 2:
+            right_trials.append(segment)
+
+if not left_trials or not right_trials:
+    raise ValueError(
+        "Need at least one left (1) and one right (2) trial in this session. "
+        f"Got left={len(left_trials)}, right={len(right_trials)}"
+    )
+
+plt.figure(figsize=(12, 4))
+plt.plot(left_trials[0][:, 0], label="Left Hand")
+plt.plot(right_trials[0][:, 0], label="Right Hand")
+plt.legend()
+plt.title("Left vs Right EEG Signal (channel 0, first trial each)")
+plt.xlabel("Samples")
+plt.ylabel("Amplitude")
+plt.show()
+--- OUTPUT ---
+<Figure size 1200x400 with 1 Axes>
+
+===== CELL 16 [code] =====
+from pathlib import Path
+
+DATA_DIR = Path("../data").resolve()
+mat_files = sorted(DATA_DIR.glob("*.mat"))
+print(f"Found {len(mat_files)} file(s) in:\n  {DATA_DIR}\n")
+for p in mat_files:
+    print(" ", p.name)
+if not mat_files:
+    print("Tip: place A01T.mat … A09E.mat (or any Graz 2a .mat) inside the data/ folder next to this notebook.")
+--- OUTPUT ---
+Found 9 file(s) in:
+  D:\AI Degree\Level 04 Sem 02\Research project in AI\Research project files\data
+
+  A01T.mat
+  A02T.mat
+  A03T.mat
+  A04T.mat
+  A05T.mat
+  A06T.mat
+  A07T.mat
+  A08T.mat
+  A09T.mat
+
+
+===== CELL 18 [markdown] =====
+### Quick visual comparison (channel 0, first ~5 s of session 0)
+
+Same y-axis scale is not enforced across subjects — this is only to **see** that every file has comparable continuous EEG before trial cutting.
+
+===== CELL 20 [markdown] =====
+### Same subject: training (`T`) vs evaluation (`E`)
+
+If you have both `AxxT.mat` and `AxxE.mat`, this lists pairs so you can compare **T** vs **E** for cross-session / domain-shift experiments later.
+
+===== CELL 21 [code] =====
+import re
+
+pairs: dict[str, dict[str, Path]] = {}
+for p in mat_files:
+    m = re.match(r"A(\d+)([TE])\.mat", p.name, re.I)
+    if m:
+        subj, kind = m.group(1), m.group(2).upper()
+        pairs.setdefault(subj, {})[kind] = p
+
+for subj in sorted(pairs.keys(), key=int):
+    kinds = pairs[subj]
+    if "T" in kinds and "E" in kinds:
+        print(f"Subject {subj}:  {kinds['T'].name}  +  {kinds['E'].name}")
+    else:
+        missing = "T" if "T" not in kinds else "E"
+        print(f"Subject {subj}: only {list(kinds.values())[0].name} (missing {missing})")
+--- OUTPUT ---
+Subject 01: only A01T.mat (missing E)
+Subject 02: only A02T.mat (missing E)
+Subject 03: only A03T.mat (missing E)
+Subject 04: only A04T.mat (missing E)
+Subject 05: only A05T.mat (missing E)
+Subject 06: only A06T.mat (missing E)
+Subject 07: only A07T.mat (missing E)
+Subject 08: only A08T.mat (missing E)
+Subject 09: only A09T.mat (missing E)
